@@ -9,7 +9,7 @@ import mutsa.TIPZIP_BE.dto.MemberDTO;
 
 //import jakarta.persistence.*;
 
-//@Entity // JPA Entity로 선언
+@Entity // JPA Entity로 선언
 @Getter
 @Setter
 @NoArgsConstructor
