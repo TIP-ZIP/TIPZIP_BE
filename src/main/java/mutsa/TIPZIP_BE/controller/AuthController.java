@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @Controller
@@ -49,7 +50,7 @@ public class AuthController {
                 System.out.println("Received social provider: " + socialProvider);
                 String kakaoAccessToken= kakaoAuthService.getAccessTokenFromKakao(authorizationcode);
                 System.out.println("Access Token: " + kakaoAccessToken);
-                //memberDTO=memberService.getMemberFromKakao(kakaoAccessToken);
+                memberDTO=memberService.getMemberFromKakao(kakaoAccessToken);
                 break;
             case "NAVER":
                 return ResponseEntity.badRequest().body("Naver login 은 아직 구현전ㅜㅜ");
@@ -59,29 +60,26 @@ public class AuthController {
             default:
                 return ResponseEntity.badRequest().body("지원하지 않는 social provider 입니다.");
         }
-        /*
+
         // 신규 회원 여부에 따른 응답
         if (memberDTO.isNewMember()) {
-            return ResponseEntity.status(201).body(Map.of(
-                    "message", "회원 등록 성공",
-                    "user_id", memberDTO.getUser_id(),
-                    "username", memberDTO.getUsername(),
-                    "badge", memberDTO.getBadge(),
-                    "access_token", memberDTO.getAccessToken(),
-                    "refresh_token", memberDTO.getRefreshToken()
-            ));
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "회원 등록 성공");
+            response.put("user_id", memberDTO.getSocial_id());
+            response.put("username", memberDTO.getUsername());
+            response.put("badge", memberDTO.getBadge());
+            //response.put("access_token", memberDTO.getAccessToken());
+            //response.put("refresh_token", memberDTO.getRefreshToken());
+            return ResponseEntity.status(201).body(response);
         } else {
-            return ResponseEntity.ok(Map.of(
-                    "message", "로그인 성공",
-                    "user_id", memberDTO.getUser_id(),
-                    "username", memberDTO.getUsername(),
-                    "badge", memberDTO.getBadge(),
-                    "access_token", memberDTO.getAccessToken(),
-                    "refresh_token", memberDTO.getRefreshToken()
-            ));
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "로그인 성공");
+            response.put("user_id", memberDTO.getSocial_id());
+            response.put("username", memberDTO.getUsername());
+            response.put("badge", memberDTO.getBadge());
+            //response.put("access_token", memberDTO.getAccessToken());
+            //response.put("refresh_token", memberDTO.getRefreshToken());
+            return ResponseEntity.status(200).body(response);
         }
-
-         */
-        return ResponseEntity.status(201).body("성공");
     }
 }
