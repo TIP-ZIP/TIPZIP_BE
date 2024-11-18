@@ -1,6 +1,7 @@
 package mutsa.TIPZIP_BE.jwt;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -45,4 +46,34 @@ public class JwtTokenProvider {
         tokenMap.put("refresh_token",refreshToken);
         return tokenMap;
     }
+    public boolean validateToken(String token) {
+        try {
+            Jwts.parserBuilder()
+                    .setSigningKey(getSecretKey())
+                    .build()
+                    .parseClaimsJws(token);
+            System.out.println("토큰이 유효합니다");
+            return true;
+        } catch (JwtException | IllegalArgumentException e) {
+            System.out.println("토큰이 유효하지 않습니다. "+ e.getMessage());
+            return false;
+        }
+
+    }
+    public String getEmailFromToken(String token) {
+        try {
+            String email = Jwts.parserBuilder()
+                    .setSigningKey(getSecretKey())
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody()
+                    .getSubject();
+            System.out.println("토큰으로 추출한 유저의 이메일: " + email);
+            return email;
+        } catch (JwtException | IllegalArgumentException e) {
+            System.out.println("토큰에서 유저의 이메일 추출을 실패하였습니다: " + e.getMessage());
+            return null; // 또는 예외를 던질 수 있습니다.
+        }
+    }
+
 }
