@@ -6,6 +6,7 @@ import com.nimbusds.jose.shaded.gson.JsonParser;
 import lombok.RequiredArgsConstructor;
 import mutsa.TIPZIP_BE.dto.MemberDTO;
 import mutsa.TIPZIP_BE.entity.MemberEntity;
+import mutsa.TIPZIP_BE.jwt.JwtTokenProvider;
 import mutsa.TIPZIP_BE.repository.MemberRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -18,6 +19,7 @@ public class MemberService {
     // jpa, mysql dependency 추가
     private final MemberRepository memberRepository;
     private static final String KAKAO_USERINFO_URL = "https://kapi.kakao.com/v2/user/me";
+    private final JwtTokenProvider jwtTokenProvider;
 
     public void save(MemberDTO memberDTO) {
         MemberEntity memberEntity = MemberEntity.createSocialMember(memberDTO);
@@ -74,6 +76,22 @@ public class MemberService {
             System.out.println("카카오에서 사용자 정보를 가져오지 못했습니다.");
         }
         memberDTO.setNewMember(isNewMember);
+
+        //JWT토큰 발급
+        String jwtAccessToken=jwtTokenProvider.createToken(memberDTO.getEmail(),3600);
+        String jwtRefreshToken=jwtTokenProvider.createToken(memberDTO.getEmail(),86400);
+        memberDTO.setAccessToken(jwtAccessToken);
+        memberDTO.setRefreshToken(jwtRefreshToken);
+        System.out.println("jwtAccessToken: " + jwtAccessToken);
+        System.out.println("jwtRefreshToken: " + jwtRefreshToken);
         return memberDTO;
+
+    }
+    public MemberDTO findByEmail(String Email ){
+        MemberEntity memberEntity=memberRepository.findByEmail(Email).orElse(null);
+        if (memberEntity!=null){
+            return MemberDTO.socialMemberDTO(memberEntity);
+        }
+        return null;
     }
 }
