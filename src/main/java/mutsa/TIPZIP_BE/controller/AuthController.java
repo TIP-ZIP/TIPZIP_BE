@@ -2,6 +2,7 @@ package mutsa.TIPZIP_BE.controller;
 
 import lombok.RequiredArgsConstructor;
 import mutsa.TIPZIP_BE.dto.MemberDTO;
+import mutsa.TIPZIP_BE.jwt.JwtTokenProvider;
 import mutsa.TIPZIP_BE.service.KakaoAuthService;
 import mutsa.TIPZIP_BE.service.MemberService;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,9 +26,11 @@ public class AuthController {
     private String KAKAO_CLIENT_SECRET;
     private final MemberService memberService;
     private final KakaoAuthService kakaoAuthService;
-    public AuthController(MemberService memberService, KakaoAuthService kakaoAuthService){
+    private final JwtTokenProvider jwtTokenProvider;
+    public AuthController(MemberService memberService, KakaoAuthService kakaoAuthService,JwtTokenProvider jwtTokenProvider){
         this.memberService=memberService;
         this.kakaoAuthService = kakaoAuthService;
+        this.jwtTokenProvider = jwtTokenProvider;
     }
 
     @PostMapping("/login")
@@ -82,4 +85,28 @@ public class AuthController {
             return ResponseEntity.status(200).body(response);
         }
     }
+    @PostMapping("/token_reissue")
+    public ResponseEntity<?> reissueAccessToken(@RequestBody Map<String, String> request) {
+        String refreshToken = request.get("refresh_token");
+
+        if (refreshToken == null) {
+            return ResponseEntity.badRequest().body("리프레시 토큰이 필요합니다.");
+        }
+
+        // 리프레시 토큰의 유효성 검사
+        if (!jwtTokenProvider.validateToken(refreshToken)) {
+            return ResponseEntity.status(401).body("유효하지 않은 리프레시 토큰입니다.");
+        }
+
+        // 리프레시 토큰에서 사용자 정보 추출
+        String memberName = jwtTokenProvider.getEmailFromToken(refreshToken);
+
+        // 해당 사용자에 대한 새로운 액세스 토큰 발급
+        String newAccessToken = jwtTokenProvider.createToken(memberName, 3600); // 1시간 유효
+
+        Map<String, String> response = new HashMap<>();
+        response.put("access_token", newAccessToken);
+        return ResponseEntity.ok(response);
+    }
+
 }
