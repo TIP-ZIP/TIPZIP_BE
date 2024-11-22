@@ -34,7 +34,7 @@ public class PostService {
 //            thumbnailUrl = postRequestsDTO.images().get(0);
 //        }
 
-        Category category = categoryRepository.findByName(postRequestsDTO.category())
+        Category category = categoryRepository.findByCategoryName(postRequestsDTO.category())
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 카테고리 입니다 : " + postRequestsDTO.category()));;
 
         Post post = Post.builder()
@@ -50,7 +50,7 @@ public class PostService {
         // 태그 처리
         postRequestsDTO.tag().forEach(tag_name -> {
             // 데이터베이스에서 태그 조회
-            Tag tag = tagRepository.findByName(tag_name)
+            Tag tag = tagRepository.findByTagName(tag_name)
                     .orElseThrow(() -> new RuntimeException("존재하지 않는 태그입니다 : " + tag_name));
 
             // 중간 테이블 저장 (PostTag)

@@ -21,7 +21,7 @@ public class Tag {
     @Column(name="tag_id")
     private long id;
 
-    private String tag_name;
+    private String tagName;
 
     // 연관관계 매핑
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "tag")
