@@ -3,6 +3,7 @@ package mutsa.TIPZIP_BE.controller;
 import lombok.RequiredArgsConstructor;
 import mutsa.TIPZIP_BE.dto.MemberDTO;
 import mutsa.TIPZIP_BE.jwt.JwtTokenProvider;
+import mutsa.TIPZIP_BE.service.GoogleAuthService;
 import mutsa.TIPZIP_BE.service.KakaoAuthService;
 import mutsa.TIPZIP_BE.service.MemberService;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,10 +28,12 @@ public class AuthController {
     private final MemberService memberService;
     private final KakaoAuthService kakaoAuthService;
     private final JwtTokenProvider jwtTokenProvider;
-    public AuthController(MemberService memberService, KakaoAuthService kakaoAuthService,JwtTokenProvider jwtTokenProvider){
+    private final GoogleAuthService googleAuthService;
+    public AuthController(MemberService memberService, KakaoAuthService kakaoAuthService,JwtTokenProvider jwtTokenProvider,GoogleAuthService googleAuthService) {
         this.memberService=memberService;
         this.kakaoAuthService = kakaoAuthService;
         this.jwtTokenProvider = jwtTokenProvider;
+        this.googleAuthService = googleAuthService;
     }
 
     @PostMapping("/login")
@@ -57,9 +60,13 @@ public class AuthController {
                 break;
             case "NAVER":
                 return ResponseEntity.badRequest().body("Naver login 은 아직 구현전ㅜㅜ");
-            case "GOOGLE":
-                return ResponseEntity.badRequest().body("Naver login 은 아직 구현전ㅜㅜ");
-
+            case "google":
+                //구글 인가코드를 통해 엑세스 토큰을 받아옴
+                System.out.println("Received social provider: " + socialProvider);
+                String googleAccessToken= googleAuthService.getAccessTokenFromGoogle(authorizationcode);
+                System.out.println("Access Token: " + googleAccessToken);
+                memberDTO=memberService.getMemberFromGoogle(googleAccessToken);
+                break;
             default:
                 return ResponseEntity.badRequest().body("지원하지 않는 social provider 입니다.");
         }
