@@ -40,10 +40,10 @@ public class PostController {
         }
     }
 
-    @GetMapping("/following")
-    public ResponseEntity<List<Post>> getFollowingPostsList() {
-
-    }
+//    @GetMapping("/following")
+//    public ResponseEntity<List<Post>> getFollowingPostsList() {
+//
+//    }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getOnePost(@PathVariable Long id) {

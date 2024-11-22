@@ -6,6 +6,7 @@ import mutsa.TIPZIP_BE.dto.PostRequestsDTO;
 import mutsa.TIPZIP_BE.entity.Category;
 import mutsa.TIPZIP_BE.entity.Post;
 import mutsa.TIPZIP_BE.entity.Tag;
+import mutsa.TIPZIP_BE.entity.post_tag;
 import mutsa.TIPZIP_BE.repository.CategoryRepository;
 import mutsa.TIPZIP_BE.repository.PostRepository;
 import mutsa.TIPZIP_BE.repository.PostTagRepository;
@@ -28,32 +29,32 @@ public class PostService {
     public Post createPost(PostRequestsDTO postRequestsDTO) {
 
         // 썸네일 없으면 첫 번째 이미지로 설정
-        String thumbnailUrl = postRequestsDTO.thumbnail_url();
-        if (thumbnailUrl == null && !postRequestsDTO.images().isEmpty()) {
-            thumbnailUrl = postRequestsDTO.images().get(0);
-        }
+//        String thumbnailUrl = postRequestsDTO.thumbnail_url();
+//        if (thumbnailUrl == null && !postRequestsDTO.images().isEmpty()) {
+//            thumbnailUrl = postRequestsDTO.images().get(0);
+//        }
 
         Category category = categoryRepository.findByName(postRequestsDTO.category())
-                .orElseThrow(() -> new RuntimeException("카테고리를 찾을 수 없습니다: " + postRequestsDTO.category()));;
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 카테고리 입니다 : " + postRequestsDTO.category()));;
 
         Post post = Post.builder()
                 .title(postRequestsDTO.title())
                 .category(category)
                 .content(postRequestsDTO.content())
                 .link_url(postRequestsDTO.link_url())
-                .thumbnail_url(thumbnailUrl)
+                .thumbnail_url(postRequestsDTO.thumbnail_url())
                 .build();
 
         postRepository.save(post);
 
         // 태그 처리
-        postRequestsDTO.tag().forEach(tagName -> {
+        postRequestsDTO.tag().forEach(tag_name -> {
             // 데이터베이스에서 태그 조회
-            Tag tag = tagRepository.findByName(tagName)
-                    .orElseThrow(() -> new RuntimeException("태그를 찾을 수 없습니다: " + tagName));
+            Tag tag = tagRepository.findByName(tag_name)
+                    .orElseThrow(() -> new RuntimeException("존재하지 않는 태그입니다 : " + tag_name));
 
             // 중간 테이블 저장 (PostTag)
-            postTagRepository.save(PostTag.builder()
+            postTagRepository.save(post_tag.builder()
                     .post(post)
                     .tag(tag)
                     .build());

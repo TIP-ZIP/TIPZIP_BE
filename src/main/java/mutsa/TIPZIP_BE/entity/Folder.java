@@ -14,15 +14,17 @@ import java.util.List;
 @AllArgsConstructor
 @Data
 @Entity
-@Table(name = "Category")
-public class Category {
+@Table(name = "Folder")
+public class Folder {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="category_id")
+    @Column(name="foder_id")
     private long id;
 
-    private String category_name;
+    private String folder_name;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "category")
+    // 연관관계 매핑
+    @OneToMany(mappedBy = "folder")
     private List<Post> posts;
 }

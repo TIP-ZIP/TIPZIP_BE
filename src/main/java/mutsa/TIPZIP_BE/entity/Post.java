@@ -27,8 +27,8 @@ public class Post {
 
     // user 매핑
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "userId")
-    private User user; // 해당 post를 작성한 유저의 id
+    @JoinColumn(name = "user_id")
+    private MemberEntity user; // 해당 post를 작성한 유저의 id
     // 스크랩 폴더 매핑
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "folder_id")
