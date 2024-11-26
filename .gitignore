@@ -39,3 +39,4 @@ out/
 # Ignore application configuration
 application.yml
 application.properties
+aws.yml
