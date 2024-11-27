@@ -11,10 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
@@ -44,6 +41,13 @@ public class S3Controller {
         } catch (Exception e) {
             return ResponseEntity.status(500).body("서버 내부 에러");
         }
+    }
+
+    // 로컬 테스트용
+    @DeleteMapping
+    public ResponseEntity<?> deleteImage(@RequestParam("imageUrl") String imageUrl) {
+        s3Service.deleteImageFromS3(imageUrl);
+        return ResponseEntity.ok(null);
     }
 
 }

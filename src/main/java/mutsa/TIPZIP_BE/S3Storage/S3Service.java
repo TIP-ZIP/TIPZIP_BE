@@ -14,6 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.URLDecoder;
 import java.util.UUID;
 
@@ -27,6 +30,7 @@ public class S3Service {
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
+    // 등록
     public String uploadToS3(MultipartFile multipartFile) throws IOException {
         String originalFileName = multipartFile.getOriginalFilename();
         String savedFileName = UUID.randomUUID() + originalFileName;
@@ -41,7 +45,6 @@ public class S3Service {
             throw e;
         }
     }
-
     @Transactional
     public String uploadFileToS3(MultipartFile multipartFile, String savedFileName) throws IOException {
 
@@ -58,5 +61,30 @@ public class S3Service {
         String imageUrl = amazonS3.getUrl(bucket, savedFileName).toString();
         // 한글이나 특수문자 깨짐을 방지하기 위해 decode
         return URLDecoder.decode(imageUrl, "utf-8");
+    }
+
+
+    // 삭제
+    private String getKeyFromImageAddress(String imageUrl){
+        try{
+            URL url = new URL(imageUrl);
+            String decodingKey = URLDecoder.decode(url.getPath(), "UTF-8");
+            String key = decodingKey.substring(9); // 앞의 '/tip.zip/' 제거
+            log.info(key);
+            return key;
+        }catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public void deleteImageFromS3(String imageUrl) {
+        String key = getKeyFromImageAddress(imageUrl);
+
+        try{
+            amazonS3.deleteObject(bucket, key);
+        }catch (AmazonServiceException e){
+            log.error("Amazon service error: " + e.getErrorMessage());
+        }
     }
 }
