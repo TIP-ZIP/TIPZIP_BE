@@ -90,7 +90,7 @@ public class MemberService {
     }
     public MemberDTO getMemberFromGoogle(String accessToken) {
         System.out.println("이제 구글 서버에서 유저 정보를 가져오겠습니다.");
-        //Webclient사용해 카카오 api 호출
+        //Webclient사용해 구글 api 호출
         WebClient webClient = WebClient.create();
         String response = webClient.get()
                 .uri(GOOGLE_USERINFO_URL)
@@ -115,7 +115,7 @@ public class MemberService {
         memberDTO.setEmail(email);
 
         boolean isNewMember=false;
-        // 카카오로부터 받은 정보가 있을 경우 추가 설정
+        // 구글로부터 받은 정보가 있을 경우 추가 설정
         if (memberDTO.getSocial_id() != null) {
             // 사용자 정보 확인을 위한 출력
             System.out.println("구글에서 가져온 사용자 정보:");
