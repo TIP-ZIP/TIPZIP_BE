@@ -9,9 +9,15 @@ import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfi
 
 @SpringBootApplication(exclude = {SecurityAutoConfiguration.class})
 @EnableJpaAuditing
-public class TipzipBeApplication {
+public class TipzipBeApplication{
+
+	public static final String APPLICATION_LOCATIONS = "spring.config.location="
+			+ "classpath:application.yml,"
+			+ "classpath:aws.yml";
 
 	public static void main(String[] args) {
-		SpringApplication.run(TipzipBeApplication.class, args);
+		new SpringApplicationBuilder(TipzipBeApplication.class)
+				.properties(APPLICATION_LOCATIONS)
+				.run(args);
 	}
 }
