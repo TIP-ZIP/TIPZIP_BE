@@ -6,9 +6,13 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -75,5 +79,23 @@ public class JwtTokenProvider {
             return null; // 또는 예외를 던질 수 있습니다.
         }
     }
+
+    public Authentication getAuthentication(String token) {
+        String email = Jwts.parserBuilder()
+                .setSigningKey(getSecretKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
+
+        return new UsernamePasswordAuthenticationToken(
+                email,
+                "",
+                Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))
+        );
+    }
+
+
+
 
 }
