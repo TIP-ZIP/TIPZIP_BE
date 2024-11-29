@@ -21,6 +21,7 @@ public class MemberService {
     private static final String KAKAO_USERINFO_URL = "https://kapi.kakao.com/v2/user/me";
     private static final String GOOGLE_USERINFO_URL = "https://www.googleapis.com/oauth2/v2/userinfo";
     private final JwtTokenProvider jwtTokenProvider;
+    private final RefreshTokenService refreshTokenService;
 
     public void save(MemberDTO memberDTO) {
         MemberEntity memberEntity = MemberEntity.createSocialMember(memberDTO);
@@ -82,7 +83,9 @@ public class MemberService {
         String jwtAccessToken=jwtTokenProvider.createToken(memberDTO.getEmail(),3600);
         String jwtRefreshToken=jwtTokenProvider.createToken(memberDTO.getEmail(),86400);
         memberDTO.setAccessToken(jwtAccessToken);
-        memberDTO.setRefreshToken(jwtRefreshToken);
+        //memberDTO.setRefreshToken(jwtRefreshToken);
+        MemberEntity memberEntity = memberRepository.findByEmail(memberDTO.getEmail()).orElse(null);
+        refreshTokenService.saveRefreshToken(memberEntity,jwtRefreshToken,86400);
         System.out.println("jwtAccessToken: " + jwtAccessToken);
         System.out.println("jwtRefreshToken: " + jwtRefreshToken);
         return memberDTO;
@@ -140,7 +143,8 @@ public class MemberService {
         String jwtAccessToken=jwtTokenProvider.createToken(memberDTO.getEmail(),3600);
         String jwtRefreshToken=jwtTokenProvider.createToken(memberDTO.getEmail(),86400);
         memberDTO.setAccessToken(jwtAccessToken);
-        memberDTO.setRefreshToken(jwtRefreshToken);
+        //memberDTO.setRefreshToken(jwtRefreshToken);
+        refreshTokenService.saveRefreshToken(new MemberEntity(),jwtRefreshToken,86400);
         System.out.println("jwtAccessToken: " + jwtAccessToken);
         System.out.println("jwtRefreshToken: " + jwtRefreshToken);
         return memberDTO;
