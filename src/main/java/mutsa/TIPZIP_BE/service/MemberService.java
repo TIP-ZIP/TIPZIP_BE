@@ -144,7 +144,8 @@ public class MemberService {
         String jwtRefreshToken=jwtTokenProvider.createToken(memberDTO.getEmail(),86400);
         memberDTO.setAccessToken(jwtAccessToken);
         //memberDTO.setRefreshToken(jwtRefreshToken);
-        refreshTokenService.saveRefreshToken(new MemberEntity(),jwtRefreshToken,86400);
+        MemberEntity memberEntity = memberRepository.findByEmail(memberDTO.getEmail()).orElse(null);
+        refreshTokenService.saveRefreshToken(memberEntity,jwtRefreshToken,86400);
         System.out.println("jwtAccessToken: " + jwtAccessToken);
         System.out.println("jwtRefreshToken: " + jwtRefreshToken);
         return memberDTO;
