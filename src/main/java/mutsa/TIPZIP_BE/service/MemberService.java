@@ -6,6 +6,7 @@ import com.nimbusds.jose.shaded.gson.JsonParser;
 import lombok.RequiredArgsConstructor;
 import mutsa.TIPZIP_BE.dto.MemberDTO;
 import mutsa.TIPZIP_BE.entity.MemberEntity;
+import mutsa.TIPZIP_BE.entity.OAuthProvider;
 import mutsa.TIPZIP_BE.jwt.JwtTokenProvider;
 import mutsa.TIPZIP_BE.repository.MemberRepository;
 import org.springframework.stereotype.Service;
@@ -56,6 +57,7 @@ public class MemberService {
         MemberDTO memberDTO = new MemberDTO();
         memberDTO.setSocial_id(nickname); // Social_id를 MemberDTO에 설정
         memberDTO.setEmail(email);
+        memberDTO.setOAuthProvider(OAuthProvider.KAKAO);
 
         boolean isNewMember=false;
         // 카카오로부터 받은 정보가 있을 경우 추가 설정
@@ -116,6 +118,7 @@ public class MemberService {
         MemberDTO memberDTO = new MemberDTO();
         memberDTO.setSocial_id(nickname); // Social_id를 MemberDTO에 설정
         memberDTO.setEmail(email);
+        memberDTO.setOAuthProvider(OAuthProvider.GOOGLE);
 
         boolean isNewMember=false;
         // 구글로부터 받은 정보가 있을 경우 추가 설정
