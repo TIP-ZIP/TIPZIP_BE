@@ -28,12 +28,6 @@ public class PostService {
 
     public Post createPost(PostRequestsDTO postRequestsDTO) {
 
-        // 썸네일 없으면 첫 번째 이미지로 설정
-//        String thumbnailUrl = postRequestsDTO.thumbnail_url();
-//        if (thumbnailUrl == null && !postRequestsDTO.images().isEmpty()) {
-//            thumbnailUrl = postRequestsDTO.images().get(0);
-//        }
-
         Category category = categoryRepository.findByCategoryName(postRequestsDTO.category())
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 카테고리 입니다 : " + postRequestsDTO.category()));;
 
@@ -70,4 +64,6 @@ public class PostService {
     public Optional<Post> getOnePost(Long postId) {
         return postRepository.findById(postId);
     }
+
+
 }

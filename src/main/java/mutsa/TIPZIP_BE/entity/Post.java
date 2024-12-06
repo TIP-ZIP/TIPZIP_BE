@@ -45,7 +45,7 @@ public class Post {
     private String title;
     @CreatedDate
     @Column(updatable = false, nullable = false)
-    private LocalDateTime created_at;
+    private LocalDateTime createdAt;
     private String content;
     private String link_url;
     private String thumbnail_url;

@@ -40,10 +40,17 @@ public class PostController {
         }
     }
 
+    // follow entity 생기면 추가
 //    @GetMapping("/following")
 //    public ResponseEntity<List<Post>> getFollowingPostsList() {
 //
 //    }
+
+    // 인증된 유저
+    @GetMapping("/cert")
+    public ResponseEntity<List<Post>> getCertPostsList() {
+
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getOnePost(@PathVariable Long id) {
@@ -66,6 +73,21 @@ public class PostController {
             Optional<Post> post = postService.getOnePost(id);
             if (post.isPresent()) {
                 return ResponseEntity.status(HttpStatus.OK).body(post.get());
+            } else {
+                return ResponseEntity.status(404).body("해당 게시물이 존재하지 않습니다.");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("서버 내부 에러");
+        }
+    }
+
+    // DELETE
+    @DeleteMapping("{id}")
+    public ResponseEntity<?> deletePost(@PathVariable Long id) {
+        try {
+            Optional<Post> post = postService.getOnePost(id);
+            if (post.isPresent()) {
+
             } else {
                 return ResponseEntity.status(404).body("해당 게시물이 존재하지 않습니다.");
             }
