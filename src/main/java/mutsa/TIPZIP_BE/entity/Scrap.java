@@ -15,6 +15,7 @@ import java.util.List;
 @Data
 @Entity
 @Table(name = "Scrap")
+@IdClass(ScrapId.class)
 public class Scrap {
 
     private long categoryId;
@@ -24,14 +25,14 @@ public class Scrap {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private MemberEntity memberEntity;
-
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
     private Post post;
 
-    @Id
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "folder_id")
+    // folder 연관관계 매핑
+    // optional 항목임
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumn(name = "folder_id", nullable = true)
     private Folder folder;
 }
