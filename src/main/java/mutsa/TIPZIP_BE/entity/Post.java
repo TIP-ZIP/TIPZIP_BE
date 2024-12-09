@@ -29,10 +29,6 @@ public class Post {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private MemberEntity user; // 해당 post를 작성한 유저의 id
-    // 스크랩 폴더 매핑
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "folder_id")
-    private Folder folder; 
     // category 매핑
     @ManyToOne
     @JoinColumn(name = "category_id")
@@ -41,6 +37,9 @@ public class Post {
     // tag 매핑
     @OneToMany(mappedBy = "post")
     private List<post_tag> postTags = new ArrayList<>();
+    // scrap 매핑
+    @OneToMany(mappedBy = "post")
+    private List<Scrap> scraps = new ArrayList<>();
 
     private String title;
     @CreatedDate
@@ -50,4 +49,5 @@ public class Post {
     private String link_url;
     private String thumbnail_url;
     private boolean scrap; // 스크랩 여부
+    private long scrapCount; // 스크랩 수
 }

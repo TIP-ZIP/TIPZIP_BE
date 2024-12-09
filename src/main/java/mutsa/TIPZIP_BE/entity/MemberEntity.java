@@ -7,6 +7,9 @@ import lombok.Setter;
 import lombok.ToString;
 import mutsa.TIPZIP_BE.dto.MemberDTO;
 
+import java.util.ArrayList;
+import java.util.List;
+
 //import jakarta.persistence.*;
 
 @Entity // JPA Entity로 선언
@@ -40,6 +43,15 @@ public class MemberEntity {
 
     @Column
     private String message;
+
+    // 연관관계 매핑
+    // folder 매핑
+    @OneToMany(mappedBy = "memberEntity")
+    private List<Folder> folders = new ArrayList<>();
+    // scrap 매핑
+    @OneToMany(mappedBy = "memberEntity")
+    private List<Scrap> scraps = new ArrayList<>();
+    // follow 매핑
 
 
     // 소셜 회원용 생성 메서드 (비밀번호 없음)
