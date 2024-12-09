@@ -1,5 +1,6 @@
 package mutsa.TIPZIP_BE;
 
+import mutsa.TIPZIP_BE.entity.Category;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -20,5 +21,7 @@ public class TipzipBeApplication{
 		new SpringApplicationBuilder(TipzipBeApplication.class)
 				.properties(APPLICATION_LOCATIONS)
 				.run(args);
+
+		Category category = new Category();
 	}
 }

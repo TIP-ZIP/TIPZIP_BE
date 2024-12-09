@@ -23,6 +23,10 @@ public class Category {
 
     private String categoryName;
 
+    // 연관관계 매핑
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "category")
     private List<Post> posts;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "category")
+    private List<Tag> tags;
 }
