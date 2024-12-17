@@ -34,4 +34,16 @@ public class MyPageController {
         }
 
     }
+    @PatchMapping("/message")
+    public ResponseEntity<?> view_message(@RequestBody Map<String, String> request, @RequestHeader("Authorization") String token) {
+        try{
+            String newMessage = request.get("message");
+            memberService.updateMessage(token,newMessage);
+            return ResponseEntity.ok("자기소개가 수정되었습니다.");
+        }catch (IllegalArgumentException e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류가 발생했습니다.");
+        }
+    }
 }
