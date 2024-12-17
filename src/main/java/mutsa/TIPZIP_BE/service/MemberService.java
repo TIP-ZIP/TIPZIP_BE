@@ -5,6 +5,7 @@ import com.nimbusds.jose.shaded.gson.JsonObject;
 import com.nimbusds.jose.shaded.gson.JsonParser;
 import lombok.RequiredArgsConstructor;
 import mutsa.TIPZIP_BE.dto.MemberDTO;
+import mutsa.TIPZIP_BE.dto.MyPageResponseDTO;
 import mutsa.TIPZIP_BE.entity.MemberEntity;
 import mutsa.TIPZIP_BE.entity.OAuthProvider;
 import mutsa.TIPZIP_BE.jwt.JwtTokenProvider;
@@ -187,6 +188,21 @@ public class MemberService {
         return memberDTO;
     }
 
+    public MyPageResponseDTO getMyPage(String token){
+        String email=jwtTokenProvider.getEmailFromToken(token.replace("Bearer ", ""));
+        MemberEntity memberEntity = memberRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+
+        //아래는 예시이며, post, follow관련 로직 구현 후 수정필요.
+        //int postCount = postRepository.countByUserId(memberEntity.getUser_id()); // 게시글 수
+        //int followerCount = followerRepository.countFollowers(memberEntity.getUser_id()); // 팔로워 수
+        //int followingCount = followerRepository.countFollowing(memberEntity.getUser_id()); // 팔로잉 수
+
+        MyPageResponseDTO myPageResponseDTO = MyPageResponseDTO.fromMemberEntity(memberEntity);
+
+        //MyPageResponseDTO myPageResponseDTO = MyPageResponseDTO.fromMemberEntity(memberEntity, postCount, followerCount, followingCount);
+        return myPageResponseDTO;
+    }
     public void updateUsername(String token, String newUsername){
         String email=jwtTokenProvider.getEmailFromToken(token.replace("Bearer ", ""));
         MemberEntity memberEntity = memberRepository.findByEmail(email)
