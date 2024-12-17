@@ -195,4 +195,12 @@ public class MemberService {
         memberEntity.setUsername(newUsername);
         memberRepository.save(memberEntity);
     }
+    public void updateMessage(String token, String newMessage){
+        String email=jwtTokenProvider.getEmailFromToken(token.replace("Bearer ", ""));
+        MemberEntity memberEntity =memberRepository.findByEmail(email)
+                        .orElseThrow(()->new IllegalArgumentException("존재하지 않는 사용자입니다."));
+
+        memberEntity.setMessage(newMessage);
+        memberRepository.save(memberEntity);
+    }
 }
