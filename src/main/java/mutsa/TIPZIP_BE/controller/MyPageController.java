@@ -1,13 +1,12 @@
 package mutsa.TIPZIP_BE.controller;
 
+import mutsa.TIPZIP_BE.dto.MemberDTO;
+import mutsa.TIPZIP_BE.dto.MyPageResponseDTO;
 import mutsa.TIPZIP_BE.service.MemberService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -19,6 +18,21 @@ public class MyPageController {
     public MyPageController(MemberService memberService) {
         this.memberService=memberService;
 
+    }
+    @GetMapping("/")
+    public ResponseEntity<?> view_mypage(@RequestHeader("Authorization") String token) {
+        try {
+            MyPageResponseDTO responseDTO = memberService.getMyPage(token);
+            System.out.println("responseDTO hashCode in Controller: " + System.identityHashCode(responseDTO));
+
+            System.out.println("Returned responseDTO: " + responseDTO);
+            return ResponseEntity.ok(responseDTO);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류가 발생했습니다.");
+        }
     }
 
     @PatchMapping("/username")
