@@ -219,4 +219,13 @@ public class MemberService {
         memberEntity.setMessage(newMessage);
         memberRepository.save(memberEntity);
     }
+    public MyPageResponseDTO getOtherUserPage(Long userId){
+        MemberEntity memberEntity=memberRepository.findById(userId)
+                .orElseThrow(()->new IllegalArgumentException("해당 유저를 찾을 수 없습니다."));
+        //아래는 예시이며, post, follow관련 로직 구현 후 수정필요.
+        //int postCount = postRepository.countByUserId(memberEntity.getUser_id()); // 게시글 수
+        //int followerCount = followerRepository.countFollowers(memberEntity.getUser_id()); // 팔로워 수
+        //int followingCount = followerRepository.countFollowing(memberEntity.getUser_id()); // 팔로잉 수
+        return MyPageResponseDTO.fromMemberEntity(memberEntity);
+    }
 }
