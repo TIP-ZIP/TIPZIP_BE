@@ -60,4 +60,15 @@ public class MyPageController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류가 발생했습니다.");
         }
     }
+    @GetMapping("/{id}")
+    public ResponseEntity<?> viewOtherUserPage(@PathVariable Long id){
+        try{
+            MyPageResponseDTO responseDTO=memberService.getOtherUserPage(id);
+            return ResponseEntity.ok(responseDTO);
+        }catch (IllegalArgumentException e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류가 발생했습니다.");
+        }
+    }
 }
