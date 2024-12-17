@@ -186,4 +186,13 @@ public class MemberService {
         //memberentity를 MemberDTO로 변환하여 반환
         return memberDTO;
     }
+
+    public void updateUsername(String token, String newUsername){
+        String email=jwtTokenProvider.getEmailFromToken(token.replace("Bearer ", ""));
+        MemberEntity memberEntity = memberRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+
+        memberEntity.setUsername(newUsername);
+        memberRepository.save(memberEntity);
+    }
 }
