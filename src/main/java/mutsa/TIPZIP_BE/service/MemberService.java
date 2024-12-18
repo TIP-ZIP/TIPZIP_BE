@@ -4,6 +4,7 @@ import com.nimbusds.jose.shaded.gson.JsonElement;
 import com.nimbusds.jose.shaded.gson.JsonObject;
 import com.nimbusds.jose.shaded.gson.JsonParser;
 import lombok.RequiredArgsConstructor;
+import mutsa.TIPZIP_BE.S3Storage.S3Service;
 import mutsa.TIPZIP_BE.dto.MemberDTO;
 import mutsa.TIPZIP_BE.dto.MyPageResponseDTO;
 import mutsa.TIPZIP_BE.entity.MemberEntity;
@@ -14,8 +15,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.io.IOException;
 import java.lang.reflect.Member;
 
 @Service
@@ -27,6 +30,7 @@ public class MemberService {
     private static final String GOOGLE_USERINFO_URL = "https://www.googleapis.com/oauth2/v2/userinfo";
     private final JwtTokenProvider jwtTokenProvider;
     private final RefreshTokenService refreshTokenService;
+    private final S3Service s3Service;
 
     public void save(MemberDTO memberDTO) {
         MemberEntity memberEntity = MemberEntity.createSocialMember(memberDTO);
@@ -218,6 +222,32 @@ public class MemberService {
 
         memberEntity.setMessage(newMessage);
         memberRepository.save(memberEntity);
+    }
+    public String updateProfileImage(String token, MultipartFile file){
+        String email=jwtTokenProvider.getEmailFromToken(token.replace("Bearer ", ""));
+        //jwt토큰으로 사용자 확인
+        if (email == null) {
+            throw new IllegalArgumentException("유효하지 않은 토큰입니다.");
+        }
+        //이메일로 사용자 정보조회
+        MemberEntity memberEntity =memberRepository.findByEmail(email)
+                .orElseThrow(()->new IllegalArgumentException("존재하지 않는 사용자입니다."));
+        //기존 이미지 존재시 삭제
+        String oldImageUrl=memberEntity.getProfile_image();
+        if(oldImageUrl!=null&& !oldImageUrl.isEmpty()){
+            s3Service.deleteImageFromS3(oldImageUrl);
+        }
+        //새 이미지 업로드
+        String newImageUrl;
+        try {
+            newImageUrl = s3Service.uploadToS3(file);
+        } catch (IOException e) {
+            throw new RuntimeException("이미지 업로드에 실패했습니다.");
+        }
+        memberEntity.setProfile_image(newImageUrl);
+        memberRepository.save(memberEntity);
+        return newImageUrl;
+
     }
     public MyPageResponseDTO getOtherUserPage(Long userId){
         MemberEntity memberEntity=memberRepository.findById(userId)
