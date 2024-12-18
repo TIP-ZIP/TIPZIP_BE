@@ -7,7 +7,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @Controller
@@ -60,6 +62,20 @@ public class MyPageController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류가 발생했습니다.");
         }
     }
+    @PatchMapping("/profileImage")
+    public ResponseEntity<?> view_profileImage(@RequestHeader("Authorization") String token, @RequestParam("file")MultipartFile file) {
+        try{
+            String newImageUrl=memberService.updateProfileImage(token,file);
+            Map<String,String>response=new HashMap<>();
+            response.put("message","프로필 이미지가 수정되었습니다.");
+            response.put("imageUrl",newImageUrl);
+            return ResponseEntity.ok(response);//새롭게 업로드된 이미지 url반환
+        }catch(IllegalArgumentException e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류가 발생했습니다.");
+        }
+    }
     @GetMapping("/{id}")
     public ResponseEntity<?> viewOtherUserPage(@PathVariable Long id){
         try{
@@ -71,4 +87,5 @@ public class MyPageController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류가 발생했습니다.");
         }
     }
+
 }
