@@ -100,7 +100,7 @@ public class PostService {
 
         List<Post> certPostsList = new ArrayList<>();
         for (MemberEntity member : certMembers) {
-            List<Post> posts = postRepository.findByUserId(member.getUser_id());
+            List<Post> posts = postRepository.findByMemberEntity(member);
             certPostsList.addAll(posts);
         }
         if(certPostsList.isEmpty()){

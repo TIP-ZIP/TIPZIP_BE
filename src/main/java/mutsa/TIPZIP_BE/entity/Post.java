@@ -28,7 +28,7 @@ public class Post {
     // user 매핑
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    private MemberEntity memberEntity; // 해당 post를 작성한 유저의 id
+    private MemberEntity memberEntity; // 해당 post를 작성한 유저
     // category 매핑
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")

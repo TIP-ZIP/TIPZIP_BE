@@ -12,5 +12,5 @@ import java.util.Optional;
 public interface PostRepository extends JpaRepository<Post, Long> {
 
     // 유저별 post들 반환
-    List<Post> findByUserId(Long email);
+    List<Post> findByMemberEntity(MemberEntity user);
 }
