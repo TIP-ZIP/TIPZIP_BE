@@ -27,6 +27,7 @@ public class MemberDTO {
     @JsonProperty("nickname") //but, google,naver 도입 시 수정 필요.
     private String social_id;
 
+
     private String email;
     private String message;
 
@@ -40,12 +41,24 @@ public class MemberDTO {
     //lombok 어노테이션으로 getter,setter,생성자 ,tostring 메서드 생략 가능
     //소셜 회원용 메서드
     public static MemberDTO socialMemberDTO(MemberEntity memberEntity){
+        if (memberEntity == null) {
+            throw new IllegalArgumentException("MemberEntity가 null입니다.");
+        }
+
+        System.out.println("MemberEntity 값: " + memberEntity); // 디버깅용 출력
         MemberDTO memberDTO = new MemberDTO();
         memberDTO.setUser_id(memberEntity.getUser_id());
+        System.out.println("User_id 설정: " + memberDTO.getUser_id());
         memberDTO.setEmail(memberEntity.getEmail());
+        System.out.println("Email 설정: " + memberDTO.getEmail());
         memberDTO.setUsername(memberEntity.getUsername());
+        System.out.println("Username설정: "+memberDTO.getUsername());
         memberDTO.setSocial_id(memberEntity.getSocial_id());
+        System.out.println("Social_id 설정: " + memberDTO.getSocial_id());
         memberDTO.setOAuthProvider(memberEntity.getSocial_provider());
+        System.out.println("Social_provider: " + memberDTO.getOAuthProvider());
+        System.out.println("MemberDTO hashCode in Service: " + System.identityHashCode(memberDTO));
+
         return memberDTO;
     }
 }

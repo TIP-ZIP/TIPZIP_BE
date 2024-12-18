@@ -84,7 +84,7 @@ public class AuthController {
             response.put("username", memberDTO.getUsername());
             response.put("badge", memberDTO.getBadge());
             response.put("access_token", memberDTO.getAccessToken());
-            response.put("refresh_token", memberDTO.getRefreshToken());
+            //response.put("refresh_token", memberDTO.getRefreshToken());
             return ResponseEntity.status(201).body(response);
         } else {
             Map<String, Object> response = new HashMap<>();
@@ -93,7 +93,7 @@ public class AuthController {
             response.put("username", memberDTO.getUsername());
             response.put("badge", memberDTO.getBadge());
             response.put("access_token", memberDTO.getAccessToken());
-            response.put("refresh_token", memberDTO.getRefreshToken());
+            //response.put("refresh_token", memberDTO.getRefreshToken());
             return ResponseEntity.status(200).body(response);
         }
     }
