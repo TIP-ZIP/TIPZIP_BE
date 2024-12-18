@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import mutsa.TIPZIP_BE.dto.MemberDTO;
+import mutsa.TIPZIP_BE.dto.PostDTO.MyPostDTO;
 import mutsa.TIPZIP_BE.dto.PostDTO.PostRequestsDTO;
 import mutsa.TIPZIP_BE.dto.PostDTO.PostResponseDTO;
 import mutsa.TIPZIP_BE.dto.PostDTO.PostSimpleDTO;
@@ -68,7 +69,8 @@ public class PostService {
         return postResponseDTO;
     }
 
-    // post 하나 반환
+
+    // post entity 반환
     public Post getOnePost(Long postId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 post 입니다."));
@@ -108,6 +110,20 @@ public class PostService {
         }
 
         return postListToSimpleDTO(certPostsList);
+    }
+
+    // 마이페이지 글 조회
+    public List<MyPostDTO> getMyposts(Long id){
+        MemberEntity memberEntity = memberRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 user 입니다."));
+
+        List<Post> myPostsList = postRepository.findByMemberEntity(memberEntity);
+
+        List<MyPostDTO> myPostDTOsList = new ArrayList<>();
+        for (Post post : myPostsList) {
+            myPostDTOsList.add(new MyPostDTO(post));
+        }
+        return myPostDTOsList;
     }
 
     @Transactional

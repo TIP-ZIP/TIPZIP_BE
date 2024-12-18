@@ -1,6 +1,7 @@
 package mutsa.TIPZIP_BE.controller;
 
 import lombok.RequiredArgsConstructor;
+import mutsa.TIPZIP_BE.dto.PostDTO.MyPostDTO;
 import mutsa.TIPZIP_BE.dto.PostDTO.PostRequestsDTO;
 import mutsa.TIPZIP_BE.dto.PostDTO.PostResponseDTO;
 import mutsa.TIPZIP_BE.dto.PostDTO.PostSimpleDTO;
@@ -54,6 +55,12 @@ public class PostController {
         PostResponseDTO postResponseDTO = new PostResponseDTO(post);
 
         return ResponseEntity.status(200).body(postResponseDTO);
+    }
+
+    @GetMapping("/user/{id}")
+    public ResponseEntity<?> getMyPosts(@PathVariable Long id) {
+        List<MyPostDTO> myPostDTOS = postService.getMyposts(id);
+        return ResponseEntity.status(200).body(myPostDTOS);
     }
 
     // PUT
