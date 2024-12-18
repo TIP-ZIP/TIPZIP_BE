@@ -26,4 +26,8 @@ public class Tag {
     // 연관관계 매핑
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "tag")
     private List<post_tag> postTags = new ArrayList<>();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    private Category category;
 }
