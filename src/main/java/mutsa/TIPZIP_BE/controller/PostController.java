@@ -53,12 +53,10 @@ public class PostController {
 //    }
 
     // 인증된 유저
-//    @GetMapping("/cert")
-//    public ResponseEntity<List<Post>> getCertPostsList() {
-//    
-//    member repository에 findByActiveTrue() 추가하고 추가
-//
-//    }
+    @GetMapping("/cert")
+    public ResponseEntity<List<Post>> getCertPostsList() {
+        List<PostSimpleDTO> postSimpleDTOSs= postService.getPostList();
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getOnePost(@PathVariable Long id) {

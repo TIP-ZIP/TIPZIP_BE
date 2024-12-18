@@ -7,11 +7,9 @@ import mutsa.TIPZIP_BE.dto.PostDTO.PostRequestsDTO;
 import mutsa.TIPZIP_BE.dto.PostDTO.PostResponseDTO;
 import mutsa.TIPZIP_BE.dto.PostDTO.PostSimpleDTO;
 import mutsa.TIPZIP_BE.entity.Category;
+import mutsa.TIPZIP_BE.entity.MemberEntity;
 import mutsa.TIPZIP_BE.entity.Post;
-import mutsa.TIPZIP_BE.repository.CategoryRepository;
-import mutsa.TIPZIP_BE.repository.PostRepository;
-import mutsa.TIPZIP_BE.repository.PostTagRepository;
-import mutsa.TIPZIP_BE.repository.TagRepository;
+import mutsa.TIPZIP_BE.repository.*;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -27,6 +25,7 @@ public class PostService {
     private final CategoryRepository categoryRepository;
     private final TagRepository tagRepository;
     private final PostTagRepository postTagRepository;
+    private final MemberRepository memberRepository;
 
     @Transactional
     public Post createPost(PostRequestsDTO postRequestsDTO) {
@@ -72,18 +71,33 @@ public class PostService {
         return postRepository.findById(postId);
     }
 
-    // 전체 글 조회
-    public List<PostSimpleDTO> getPostList(){
-
-        List<Post> postList = postRepository.findAll();
-
+    // Post List -> SimpleDTO List 변환 method
+    private static List<PostSimpleDTO> postListToSimpleDTO(List<Post> postList) {
         List<PostSimpleDTO> postResponseList = new ArrayList<>();
         for (Post post : postList) {
             PostSimpleDTO dto = new PostSimpleDTO(post);
             postResponseList.add(dto);
         }
-
         return postResponseList;
+    }
+
+    // 전체 글 조회
+    public List<PostSimpleDTO> getPostList(){
+
+        List<Post> postList = postRepository.findAll();
+        return postListToSimpleDTO(postList);
+    }
+
+    // 인증 유저 글 조회
+    public List<PostSimpleDTO> getCertPostsList(){
+        List<MemberEntity> certMembers = memberRepository.findByBadgeTrue();
+
+        List<Post> certPostsList = new ArrayList<>();
+        for (MemberEntity member : certMembers) {
+            List<Post> posts = postRepository.findByUserId(member.getUser_id());
+            certPostsList.addAll(posts);
+        }
+        return postListToSimpleDTO(certPostsList);
     }
 
     @Transactional
