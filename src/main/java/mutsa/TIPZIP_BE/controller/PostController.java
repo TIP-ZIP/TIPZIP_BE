@@ -22,86 +22,52 @@ public class PostController {
 
     // POST
     @PostMapping
-    public ResponseEntity<?> createPost(@RequestBody PostRequestsDTO postRequestsDTO) {
-        try {
-            Post post = postService.createPost(postRequestsDTO);
-            PostResponseDTO postResponseDTO = new PostResponseDTO(post);
-            return ResponseEntity.status(201).body(postResponseDTO);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
+    public ResponseEntity<?> createPost(@RequestHeader(value = "Authorization") String token, @RequestBody PostRequestsDTO postRequestsDTO) {
+        PostResponseDTO postResponseDTO = postService.createPost(token, postRequestsDTO);
+        return ResponseEntity.status(201).body(postResponseDTO);
     }
 
     // GET
     @GetMapping
     public ResponseEntity<?> getPostsList(@RequestParam(defaultValue = "recent") String sort) {
-        try {
-            List<PostSimpleDTO> postSimpleDTOSs= postService.getPostList();
-
-            return ResponseEntity
-                    .status(HttpStatus.OK)
-                    .body(postSimpleDTOSs);
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body("서버 내부 에러");
-        }
+        List<PostSimpleDTO> postSimpleDTOSs= postService.getPostList();
+        return ResponseEntity.status(HttpStatus.OK).body(postSimpleDTOSs);
     }
 
     // follow entity 생기면 추가
 //    @GetMapping("/following")
-//    public ResponseEntity<List<Post>> getFollowingPostsList() {
+//    public ResponseEntity<?> getFollowingPostsList() {
 //
 //    }
 
     // 인증된 유저
     @GetMapping("/cert")
-    public ResponseEntity<List<Post>> getCertPostsList() {
+    public ResponseEntity<?> getCertPostsList() {
         List<PostSimpleDTO> postSimpleDTOSs= postService.getPostList();
+        return ResponseEntity.status(HttpStatus.OK).body(postSimpleDTOSs);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getOnePost(@PathVariable Long id) {
-        try {
-            Optional<Post> post = postService.getOnePost(id);
-            if (post.isPresent()) {
-                PostResponseDTO postResponseDTO = new PostResponseDTO(post.get());
-                return ResponseEntity.status(HttpStatus.OK).body(postResponseDTO);
-            } else {
-                return ResponseEntity.status(404).body("해당 게시물이 존재하지 않습니다.");
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body("서버 내부 에러");
-        }
+        Post post = postService.getOnePost(id);
+        PostResponseDTO postResponseDTO = new PostResponseDTO(post);
+
+        return ResponseEntity.status(200).body(postResponseDTO);
     }
 
     // PUT
-    @PutMapping("/{id}")
-    public ResponseEntity<?> modifyPost(@PathVariable Long id) {
-        try {
-            Optional<Post> post = postService.getOnePost(id);
-            if (post.isPresent()) {
-                return ResponseEntity.status(HttpStatus.OK).body(post);
-            } else {
-                return ResponseEntity.status(404).body("해당 게시물이 존재하지 않습니다.");
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body("서버 내부 에러");
-        }
-    }
+//    @PutMapping("/{id}")
+//    public ResponseEntity<?> modifyPost(@PathVariable Long id) {
+//        Post post = postService.getOnePost(id);
+//
+//
+//    }
 
     // DELETE
     @DeleteMapping("{id}")
     public ResponseEntity<?> deletePost(@PathVariable Long id) {
-        try {
-            Optional<Post> post = postService.getOnePost(id);
-            if (post.isPresent()) {
-                postService.deletePost(id);
-                return ResponseEntity.status(HttpStatus.OK).body("삭제 성공");
-            } else {
-                return ResponseEntity.status(404).body("해당 게시물이 존재하지 않습니다.");
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body("서버 내부 에러");
-        }
+        postService.deletePost(id);
+        return ResponseEntity.status(200).build();
     }
 
 }

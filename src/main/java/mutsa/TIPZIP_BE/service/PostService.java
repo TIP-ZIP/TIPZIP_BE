@@ -3,6 +3,7 @@ package mutsa.TIPZIP_BE.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import mutsa.TIPZIP_BE.dto.MemberDTO;
 import mutsa.TIPZIP_BE.dto.PostDTO.PostRequestsDTO;
 import mutsa.TIPZIP_BE.dto.PostDTO.PostResponseDTO;
 import mutsa.TIPZIP_BE.dto.PostDTO.PostSimpleDTO;
@@ -28,13 +29,13 @@ public class PostService {
     private final MemberRepository memberRepository;
 
     @Transactional
-    public Post createPost(PostRequestsDTO postRequestsDTO) {
+    public PostResponseDTO createPost(String token, PostRequestsDTO postRequestsDTO) {
 
         Category category = categoryRepository.findByCategoryName(postRequestsDTO.category())
-                .orElseThrow(() -> new RuntimeException("존재하지 않는 카테고리 입니다 : " + postRequestsDTO.category()));;
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 Category 입니다 : " + postRequestsDTO.category()));;
 
         // 현재 로그인 중인 사용자 정보 가져오기 (메소드 필요)
-//        MemberService user =
+//        MemberDTO memberDTO = MemberService.getUserFromToken(token);
 
         Post post = Post.builder()
                 .title(postRequestsDTO.title())
@@ -63,12 +64,15 @@ public class PostService {
 //                    .build());
 //        });
 
-        return post;
+        PostResponseDTO postResponseDTO = new PostResponseDTO(post);
+        return postResponseDTO;
     }
 
     // post 하나 반환
-    public Optional<Post> getOnePost(Long postId) {
-        return postRepository.findById(postId);
+    public Post getOnePost(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 post 입니다."));
+        return post;
     }
 
     // Post List -> SimpleDTO List 변환 method
@@ -83,7 +87,6 @@ public class PostService {
 
     // 전체 글 조회
     public List<PostSimpleDTO> getPostList(){
-
         List<Post> postList = postRepository.findAll();
         return postListToSimpleDTO(postList);
     }
@@ -91,18 +94,28 @@ public class PostService {
     // 인증 유저 글 조회
     public List<PostSimpleDTO> getCertPostsList(){
         List<MemberEntity> certMembers = memberRepository.findByBadgeTrue();
+        if(certMembers.isEmpty()){
+            throw new RuntimeException("인증 user가 존재하지 않습니다.");
+        }
 
         List<Post> certPostsList = new ArrayList<>();
         for (MemberEntity member : certMembers) {
             List<Post> posts = postRepository.findByUserId(member.getUser_id());
             certPostsList.addAll(posts);
         }
+        if(certPostsList.isEmpty()){
+            throw new RuntimeException("인증 user post가 존재하지 않습니다.");
+        }
+
         return postListToSimpleDTO(certPostsList);
     }
 
     @Transactional
     public void deletePost(Long postId) {
-        postRepository.deleteById(postId);
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 post 입니다."));
+
+        postRepository.delete(post);
     }
 
 }
