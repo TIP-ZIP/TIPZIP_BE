@@ -26,7 +26,7 @@ public class Folder {
     private String folder_name;
 
     // 연관관계 매핑
-    @OneToMany(mappedBy = "folder")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "folder")
     private List<Scrap> scraps;
 
     @ManyToOne(fetch = FetchType.LAZY)

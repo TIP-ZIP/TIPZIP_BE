@@ -1,7 +1,6 @@
 package mutsa.TIPZIP_BE;
 
 import mutsa.TIPZIP_BE.entity.Category;
-import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
@@ -22,6 +21,15 @@ public class TipzipBeApplication{
 				.properties(APPLICATION_LOCATIONS)
 				.run(args);
 
-		Category category = new Category();
+		// 카테고리 세팅
+		Category category1 = Category.builder().categoryName("정리/공간 활용").build();
+		Category category2 = Category.builder().categoryName("주방").build();
+		Category category3 = Category.builder().categoryName("청소").build();
+		Category category4 = Category.builder().categoryName("건강").build();
+		Category category5 = Category.builder().categoryName("IT").build();
+		Category category6 = Category.builder().categoryName("뷰티&패션").build();
+		Category category7 = Category.builder().categoryName("여가&휴식").build();
+		Category category8 = Category.builder().categoryName("로컬").build();
+		Category category9 = Category.builder().categoryName("기타").build();
 	}
 }

@@ -28,17 +28,17 @@ public class Post {
     // user 매핑
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    private MemberEntity user; // 해당 post를 작성한 유저의 id
+    private MemberEntity memberEntity; // 해당 post를 작성한 유저의 id
     // category 매핑
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private Category category;
 
     // tag 매핑
-    @OneToMany(mappedBy = "post")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "post")
     private List<post_tag> postTags = new ArrayList<>();
     // scrap 매핑
-    @OneToMany(mappedBy = "post")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "post")
     private List<Scrap> scraps = new ArrayList<>();
 
     private String title;
@@ -50,4 +50,14 @@ public class Post {
     private String thumbnail_url;
     private boolean scrap; // 스크랩 여부
     private long scrapCount; // 스크랩 수
+
+    public ArrayList<String> getPostTags(long postId) {
+        ArrayList<String> tags = new ArrayList<>();
+
+        for (post_tag postTag : postTags) {
+            tags.add(postTag.getTag().getTagName()); // Tag 객체에서 태그 이름 추출
+        }
+        return tags;
+    }
+
 }
