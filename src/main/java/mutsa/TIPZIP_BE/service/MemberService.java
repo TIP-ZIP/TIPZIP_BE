@@ -4,7 +4,9 @@ import com.nimbusds.jose.shaded.gson.JsonElement;
 import com.nimbusds.jose.shaded.gson.JsonObject;
 import com.nimbusds.jose.shaded.gson.JsonParser;
 import lombok.RequiredArgsConstructor;
+import mutsa.TIPZIP_BE.S3Storage.S3Service;
 import mutsa.TIPZIP_BE.dto.MemberDTO;
+import mutsa.TIPZIP_BE.dto.MyPageResponseDTO;
 import mutsa.TIPZIP_BE.entity.MemberEntity;
 import mutsa.TIPZIP_BE.entity.OAuthProvider;
 import mutsa.TIPZIP_BE.jwt.JwtTokenProvider;
@@ -13,8 +15,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.io.IOException;
 import java.lang.reflect.Member;
 
 @Service
@@ -26,6 +30,7 @@ public class MemberService {
     private static final String GOOGLE_USERINFO_URL = "https://www.googleapis.com/oauth2/v2/userinfo";
     private final JwtTokenProvider jwtTokenProvider;
     private final RefreshTokenService refreshTokenService;
+    private final S3Service s3Service;
 
     public void save(MemberDTO memberDTO) {
         MemberEntity memberEntity = MemberEntity.createSocialMember(memberDTO);
@@ -185,5 +190,72 @@ public class MemberService {
         System.out.println("Service 반환 전 MemberDTO: " + memberDTO); // 디버깅
         //memberentity를 MemberDTO로 변환하여 반환
         return memberDTO;
+    }
+
+    public MyPageResponseDTO getMyPage(String token){
+        String email=jwtTokenProvider.getEmailFromToken(token.replace("Bearer ", ""));
+        MemberEntity memberEntity = memberRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+
+        //아래는 예시이며, post, follow관련 로직 구현 후 수정필요.
+        //int postCount = postRepository.countByUserId(memberEntity.getUser_id()); // 게시글 수
+        //int followerCount = followerRepository.countFollowers(memberEntity.getUser_id()); // 팔로워 수
+        //int followingCount = followerRepository.countFollowing(memberEntity.getUser_id()); // 팔로잉 수
+
+        MyPageResponseDTO myPageResponseDTO = MyPageResponseDTO.fromMemberEntity(memberEntity);
+
+        //MyPageResponseDTO myPageResponseDTO = MyPageResponseDTO.fromMemberEntity(memberEntity, postCount, followerCount, followingCount);
+        return myPageResponseDTO;
+    }
+    public void updateUsername(String token, String newUsername){
+        String email=jwtTokenProvider.getEmailFromToken(token.replace("Bearer ", ""));
+        MemberEntity memberEntity = memberRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+
+        memberEntity.setUsername(newUsername);
+        memberRepository.save(memberEntity);
+    }
+    public void updateMessage(String token, String newMessage){
+        String email=jwtTokenProvider.getEmailFromToken(token.replace("Bearer ", ""));
+        MemberEntity memberEntity =memberRepository.findByEmail(email)
+                        .orElseThrow(()->new IllegalArgumentException("존재하지 않는 사용자입니다."));
+
+        memberEntity.setMessage(newMessage);
+        memberRepository.save(memberEntity);
+    }
+    public String updateProfileImage(String token, MultipartFile file){
+        String email=jwtTokenProvider.getEmailFromToken(token.replace("Bearer ", ""));
+        //jwt토큰으로 사용자 확인
+        if (email == null) {
+            throw new IllegalArgumentException("유효하지 않은 토큰입니다.");
+        }
+        //이메일로 사용자 정보조회
+        MemberEntity memberEntity =memberRepository.findByEmail(email)
+                .orElseThrow(()->new IllegalArgumentException("존재하지 않는 사용자입니다."));
+        //기존 이미지 존재시 삭제
+        String oldImageUrl=memberEntity.getProfile_image();
+        if(oldImageUrl!=null&& !oldImageUrl.isEmpty()){
+            s3Service.deleteImageFromS3(oldImageUrl);
+        }
+        //새 이미지 업로드
+        String newImageUrl;
+        try {
+            newImageUrl = s3Service.uploadToS3(file);
+        } catch (IOException e) {
+            throw new RuntimeException("이미지 업로드에 실패했습니다.");
+        }
+        memberEntity.setProfile_image(newImageUrl);
+        memberRepository.save(memberEntity);
+        return newImageUrl;
+
+    }
+    public MyPageResponseDTO getOtherUserPage(Long userId){
+        MemberEntity memberEntity=memberRepository.findById(userId)
+                .orElseThrow(()->new IllegalArgumentException("해당 유저를 찾을 수 없습니다."));
+        //아래는 예시이며, post, follow관련 로직 구현 후 수정필요.
+        //int postCount = postRepository.countByUserId(memberEntity.getUser_id()); // 게시글 수
+        //int followerCount = followerRepository.countFollowers(memberEntity.getUser_id()); // 팔로워 수
+        //int followingCount = followerRepository.countFollowing(memberEntity.getUser_id()); // 팔로잉 수
+        return MyPageResponseDTO.fromMemberEntity(memberEntity);
     }
 }
