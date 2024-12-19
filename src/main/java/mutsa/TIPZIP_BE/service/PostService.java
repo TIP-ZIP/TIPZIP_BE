@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import mutsa.TIPZIP_BE.dto.MemberDTO;
+import mutsa.TIPZIP_BE.dto.PostDTO.MyPostDTO;
 import mutsa.TIPZIP_BE.dto.PostDTO.PostRequestsDTO;
 import mutsa.TIPZIP_BE.dto.PostDTO.PostResponseDTO;
 import mutsa.TIPZIP_BE.dto.PostDTO.PostSimpleDTO;
@@ -11,9 +12,12 @@ import mutsa.TIPZIP_BE.entity.Category;
 import mutsa.TIPZIP_BE.entity.MemberEntity;
 import mutsa.TIPZIP_BE.entity.Post;
 import mutsa.TIPZIP_BE.repository.*;
+import org.hibernate.query.Order;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -68,7 +72,8 @@ public class PostService {
         return postResponseDTO;
     }
 
-    // post 하나 반환
+
+    // post entity 반환
     public Post getOnePost(Long postId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 post 입니다."));
@@ -85,14 +90,40 @@ public class PostService {
         return postResponseList;
     }
 
+    // 정렬 옵션
+    private Sort getSort(String sort) {
+        switch (sort) {
+            case "recent":
+                return Sort.by(Sort.Order.desc("createdAt"));
+            case "oldest":
+                return Sort.by(Sort.Order.asc("createdAt"));
+            case "popular":
+                return Sort.by(Sort.Order.desc("scrapCount"));
+            default:
+                throw new RuntimeException("존재하지 않는 정렬 옵션입니다.");
+        }
+    }
+    private Comparator<Post> getComparator(String sort) {
+        switch (sort) {
+            case "recent":
+                return Comparator.comparing(Post::getCreatedAt).reversed();
+            case "oldest":
+                return Comparator.comparing(Post::getCreatedAt);
+            case "popular":
+                return Comparator.comparing(Post::getScrapCount).reversed();
+            default:
+                throw new RuntimeException("존재하지 않는 정렬 옵션입니다.");
+        }
+    }
+
     // 전체 글 조회
-    public List<PostSimpleDTO> getPostList(){
-        List<Post> postList = postRepository.findAll();
+    public List<PostSimpleDTO> getPostList(String sort, Long category){
+        List<Post> postList = postRepository.findAll(getSort(sort));
         return postListToSimpleDTO(postList);
     }
 
     // 인증 유저 글 조회
-    public List<PostSimpleDTO> getCertPostsList(){
+    public List<PostSimpleDTO> getCertPostsList(String sort, Long category){
         List<MemberEntity> certMembers = memberRepository.findByBadgeTrue();
         if(certMembers.isEmpty()){
             throw new RuntimeException("인증 user가 존재하지 않습니다.");
@@ -107,7 +138,23 @@ public class PostService {
             throw new RuntimeException("인증 user post가 존재하지 않습니다.");
         }
 
+        certPostsList.sort(getComparator(sort));
+
         return postListToSimpleDTO(certPostsList);
+    }
+
+    // 마이페이지 글 조회
+    public List<MyPostDTO> getMyposts(Long id){
+        MemberEntity memberEntity = memberRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 user 입니다."));
+
+        List<Post> myPostsList = postRepository.findByMemberEntity(memberEntity);
+
+        List<MyPostDTO> myPostDTOsList = new ArrayList<>();
+        for (Post post : myPostsList) {
+            myPostDTOsList.add(new MyPostDTO(post));
+        }
+        return myPostDTOsList;
     }
 
     @Transactional
