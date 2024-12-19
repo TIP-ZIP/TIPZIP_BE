@@ -52,7 +52,11 @@ public class MemberEntity {
     @OneToMany(mappedBy = "memberEntity")
     private List<Scrap> scraps = new ArrayList<>();
     // follow 매핑
+    @OneToMany(mappedBy = "follower", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Follow> followingList = new ArrayList<>(); // 내가 팔로우 하는 사람들
 
+    @OneToMany(mappedBy = "following", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Follow> followerList = new ArrayList<>(); // 나를 팔로우 하는 사람들
 
     // 소셜 회원용 생성 메서드 (비밀번호 없음)
     public static MemberEntity createSocialMember(MemberDTO socialMemberDTO) {
