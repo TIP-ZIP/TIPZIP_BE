@@ -117,26 +117,42 @@ public class PostService {
     }
 
     // 전체 글 조회
-    public List<PostSimpleDTO> getPostList(String sort, Long category){
-        List<Post> postList = postRepository.findAll(getSort(sort));
+    public List<PostSimpleDTO> getPostList(String sort, Long categoryId){
+        List<Post> postList;
+
+        if (categoryId != null) {
+            Category category = categoryRepository.findById(categoryId)
+                    .orElseThrow(() -> new RuntimeException("존재하지 않는 category ID 입니다."));
+
+            postList = postRepository.findByCategory(category, getSort(sort));
+        }
+        else { postList = postRepository.findAll(getSort(sort)); }
+
         return postListToSimpleDTO(postList);
     }
 
     // 인증 유저 글 조회
-    public List<PostSimpleDTO> getCertPostsList(String sort, Long category){
+    public List<PostSimpleDTO> getCertPostsList(String sort, Long categoryId){
         List<MemberEntity> certMembers = memberRepository.findByBadgeTrue();
         if(certMembers.isEmpty()){
             throw new RuntimeException("인증 user가 존재하지 않습니다.");
         }
 
         List<Post> certPostsList = new ArrayList<>();
-        for (MemberEntity member : certMembers) {
-            List<Post> posts = postRepository.findByMemberEntity(member);
-            certPostsList.addAll(posts);
+        if (categoryId != null) {
+            Category category = categoryRepository.findById(categoryId)
+                    .orElseThrow(() -> new RuntimeException("존재하지 않는 category ID 입니다."));
+            for (MemberEntity member : certMembers) {
+                List<Post> posts = postRepository.findByCategoryAndMemberEntity(category, member);
+                certPostsList.addAll(posts);
+            }
+        } else {
+            for (MemberEntity member : certMembers) {
+                List<Post> posts = postRepository.findByMemberEntity(member);
+                certPostsList.addAll(posts);
+            }
         }
-        if(certPostsList.isEmpty()){
-            throw new RuntimeException("인증 user post가 존재하지 않습니다.");
-        }
+        if(certPostsList.isEmpty()){ throw new RuntimeException("인증 user post가 존재하지 않습니다."); }
 
         certPostsList.sort(getComparator(sort));
 

@@ -1,5 +1,6 @@
 package mutsa.TIPZIP_BE.repository;
 
+import mutsa.TIPZIP_BE.entity.Category;
 import mutsa.TIPZIP_BE.entity.MemberEntity;
 import mutsa.TIPZIP_BE.entity.Post;
 import org.springframework.data.domain.Sort;
@@ -13,7 +14,9 @@ import java.util.Optional;
 public interface PostRepository extends JpaRepository<Post, Long> {
 
     List<Post> findAll(Sort sort);
-    
+    List<Post> findByCategory(Category category, Sort sort);
+
     // 유저별 post들 반환
     List<Post> findByMemberEntity(MemberEntity user);
+    List<Post> findByCategoryAndMemberEntity(Category category, MemberEntity user);
 }
