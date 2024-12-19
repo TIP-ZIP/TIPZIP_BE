@@ -38,6 +38,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET,"/posts/**").authenticated()
                 .requestMatchers(HttpMethod.PATCH,"/posts/**").authenticated()
                 .requestMatchers(HttpMethod.DELETE,"/posts/**").authenticated()
+                .requestMatchers("/follow/**").authenticated()
                 .requestMatchers("/scrap","/scarp/").authenticated()
                 .requestMatchers("/folder","/folder/").authenticated()
                 .anyRequest().permitAll()
