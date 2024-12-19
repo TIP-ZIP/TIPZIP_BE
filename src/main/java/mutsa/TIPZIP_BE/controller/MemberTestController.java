@@ -21,19 +21,19 @@ public class MemberTestController {
     }
 
 
-    @GetMapping("/get-user")
-    public ResponseEntity<?> getUser(@RequestHeader("Authorization") String token) {
-        try {
-            MemberDTO memberDTO = memberService.getUserFromToken(token);
-            System.out.println("MemberDTO hashCode in Controller: " + System.identityHashCode(memberDTO));
-
-            System.out.println("Returned MemberDTO: " + memberDTO);
-            return ResponseEntity.ok(memberDTO);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류가 발생했습니다.");
-        }
-    }
+//    @GetMapping("/get-user")
+//    public ResponseEntity<?> getUser(@RequestHeader("Authorization") String token) {
+//        try {
+//            MemberDTO memberDTO = memberService.getUserFromToken(token);
+//            System.out.println("MemberDTO hashCode in Controller: " + System.identityHashCode(memberDTO));
+//
+//            System.out.println("Returned MemberDTO: " + memberDTO);
+//            return ResponseEntity.ok(memberDTO);
+//        } catch (IllegalArgumentException e) {
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류가 발생했습니다.");
+//        }
+//    }
 }

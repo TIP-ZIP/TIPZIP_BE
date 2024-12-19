@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j // 로거
 @Service
@@ -31,6 +32,7 @@ public class PostService {
     private final TagRepository tagRepository;
     private final PostTagRepository postTagRepository;
     private final MemberRepository memberRepository;
+    private final MemberService memberService;
 
     @Transactional
     public PostResponseDTO createPost(String token, PostRequestsDTO postRequestsDTO) {
@@ -38,13 +40,13 @@ public class PostService {
         Category category = categoryRepository.findByCategoryName(postRequestsDTO.category())
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 Category 입니다 : " + postRequestsDTO.category()));;
 
-        // 현재 로그인 중인 사용자 정보 가져오기 (메소드 필요)
-//        MemberDTO memberDTO = MemberService.getUserFromToken(token);
+        // 현재 로그인 중인 사용자 정보 가져오기
+        MemberEntity member = memberService.getUserFromToken(token);
 
         Post post = Post.builder()
                 .title(postRequestsDTO.title())
                 .category(category)
-//                .user(user)
+                .memberEntity(member)
                 .content(postRequestsDTO.content())
                 .link_url(postRequestsDTO.link_url())
                 .thumbnail_url(postRequestsDTO.thumbnail_url())
@@ -82,12 +84,9 @@ public class PostService {
 
     // Post List -> SimpleDTO List 변환 method
     private static List<PostSimpleDTO> postListToSimpleDTO(List<Post> postList) {
-        List<PostSimpleDTO> postResponseList = new ArrayList<>();
-        for (Post post : postList) {
-            PostSimpleDTO dto = new PostSimpleDTO(post);
-            postResponseList.add(dto);
-        }
-        return postResponseList;
+        return postList.stream()
+                .map(PostSimpleDTO::new)
+                .collect(Collectors.toList());
     }
 
     // 정렬 옵션
@@ -166,11 +165,9 @@ public class PostService {
 
         List<Post> myPostsList = postRepository.findByMemberEntity(memberEntity);
 
-        List<MyPostDTO> myPostDTOsList = new ArrayList<>();
-        for (Post post : myPostsList) {
-            myPostDTOsList.add(new MyPostDTO(post));
-        }
-        return myPostDTOsList;
+        return myPostsList.stream()
+                .map(MyPostDTO::new)
+                .collect(Collectors.toList());
     }
 
     @Transactional
