@@ -54,6 +54,21 @@ public class FollowController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류가 발생했습니다.");
         }
     }
+    @DeleteMapping("/{followingId}")
+    public ResponseEntity<String> unfollow(@PathVariable Long followingId,@RequestHeader("Authorization") String token) {
+        try{
+            MemberEntity follower= memberRepository.findById(memberService.getUserFromToken(token).getUser_id())
+                    .orElseThrow(() -> new IllegalArgumentException("팔로우 취소를 요청한 유저를 찾을 수 없습니다."));
+            MemberEntity following=memberRepository.findById(followingId)
+                    .orElseThrow(() -> new IllegalArgumentException("팔로우 취소대상 유저를 찾을 수 없습니다."));
+            followService.unfollow(follower, following);
+            return ResponseEntity.ok("팔로우 취소 성공");
+        }catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류가 발생했습니다.");
+        }
+    }
 
 }
 
