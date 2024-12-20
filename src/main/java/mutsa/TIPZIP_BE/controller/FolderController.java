@@ -2,6 +2,7 @@ package mutsa.TIPZIP_BE.controller;
 
 import lombok.RequiredArgsConstructor;
 import mutsa.TIPZIP_BE.dto.FolderDTO.FolderRequestsDTO;
+import mutsa.TIPZIP_BE.dto.FolderDTO.FolderResponseDTO;
 import mutsa.TIPZIP_BE.dto.PostDTO.PostRequestsDTO;
 import mutsa.TIPZIP_BE.dto.PostDTO.PostResponseDTO;
 import mutsa.TIPZIP_BE.dto.PostDTO.PostSimpleDTO;
@@ -21,9 +22,9 @@ public class FolderController {
 
     // POST
     @PostMapping
-    public ResponseEntity<?> createFolder(@RequestHeader(value = "Authorization") String token, @RequestBody FolderRequestsDTO postRequestsDTO) {
-        PostResponseDTO postResponseDTO = postService.createPost(token, postRequestsDTO);
-        return ResponseEntity.status(201).body(postResponseDTO);
+    public ResponseEntity<?> createFolder(@RequestHeader(value = "Authorization") String token, @RequestBody FolderRequestsDTO folderRequestsDTO) {
+        FolderResponseDTO folderResponseDTO = folderService.createFolder(token, folderRequestsDTO);
+        return ResponseEntity.status(201).body(folderResponseDTO);
     }
 
     // GET
