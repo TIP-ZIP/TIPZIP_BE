@@ -1,6 +1,7 @@
 package mutsa.TIPZIP_BE.controller;
 
 import lombok.RequiredArgsConstructor;
+import mutsa.TIPZIP_BE.dto.FolderDTO.FolderCountResponseDTO;
 import mutsa.TIPZIP_BE.dto.FolderDTO.FolderRequestsDTO;
 import mutsa.TIPZIP_BE.dto.FolderDTO.FolderResponseDTO;
 import mutsa.TIPZIP_BE.dto.PostDTO.PostRequestsDTO;
@@ -29,9 +30,9 @@ public class FolderController {
 
     // GET
     @GetMapping
-    public ResponseEntity<?> getPostsList(@RequestParam(defaultValue = "recent") String sort, @RequestParam(required = false) Long category) {
-        List<PostSimpleDTO> postSimpleDTOSs= postService.getPostList(sort, category);
-        return ResponseEntity.status(HttpStatus.OK).body(postSimpleDTOSs);
+    public ResponseEntity<?> getPostsList(@RequestParam(defaultValue = "false") boolean is_my) {
+        List<FolderCountResponseDTO> folderCountResponseDTOS = folderService.getFolderList(is_my);
+        return ResponseEntity.status(HttpStatus.OK).body(folderCountResponseDTOS);
     }
 
     // PUT
