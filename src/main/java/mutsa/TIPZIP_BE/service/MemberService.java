@@ -169,7 +169,7 @@ public class MemberService {
         return null;
     }
 
-    public MemberDTO getUserFromToken(String token) {
+    public MemberEntity getUserFromToken(String token) {
         //Bearer부분 제거
         String accessToken = token.replace("Bearer ", "");
 
@@ -185,9 +185,9 @@ public class MemberService {
         }
         //이메일 통해 DB에서 유저 정보 조회
         MemberEntity memberEntity = memberRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("해당 유저를 찾을 수 없습니다"));
-        MemberDTO memberDTO = MemberDTO.socialMemberDTO(memberEntity);
-        System.out.println("Service 반환 전 MemberDTO: " + memberDTO); // 디버깅
-        //memberentity를 MemberDTO로 변환하여 반환
-        return memberDTO;
+//        MemberDTO memberDTO = MemberDTO.socialMemberDTO(memberEntity);
+//        System.out.println("Service 반환 전 MemberDTO: " + memberDTO); // 디버깅
+        //memberentity 반환
+        return memberEntity;
     }
 }

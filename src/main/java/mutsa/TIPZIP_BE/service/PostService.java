@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j // 로거
 @Service
@@ -31,6 +32,7 @@ public class PostService {
     private final TagRepository tagRepository;
     private final PostTagRepository postTagRepository;
     private final MemberRepository memberRepository;
+    private final MemberService memberService;
 
     @Transactional
     public PostResponseDTO createPost(String token, PostRequestsDTO postRequestsDTO) {
@@ -38,13 +40,13 @@ public class PostService {
         Category category = categoryRepository.findByCategoryName(postRequestsDTO.category())
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 Category 입니다 : " + postRequestsDTO.category()));;
 
-        // 현재 로그인 중인 사용자 정보 가져오기 (메소드 필요)
-//        MemberDTO memberDTO = MemberService.getUserFromToken(token);
+        // 현재 로그인 중인 사용자 정보 가져오기
+        MemberEntity member = memberService.getUserFromToken(token);
 
         Post post = Post.builder()
                 .title(postRequestsDTO.title())
                 .category(category)
-//                .user(user)
+                .memberEntity(member)
                 .content(postRequestsDTO.content())
                 .link_url(postRequestsDTO.link_url())
                 .thumbnail_url(postRequestsDTO.thumbnail_url())
@@ -68,26 +70,21 @@ public class PostService {
 //                    .build());
 //        });
 
-        PostResponseDTO postResponseDTO = new PostResponseDTO(post);
-        return postResponseDTO;
+        return new PostResponseDTO(post);
     }
 
 
     // post entity 반환
     public Post getOnePost(Long postId) {
-        Post post = postRepository.findById(postId)
+        return postRepository.findById(postId)
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 post 입니다."));
-        return post;
     }
 
     // Post List -> SimpleDTO List 변환 method
     private static List<PostSimpleDTO> postListToSimpleDTO(List<Post> postList) {
-        List<PostSimpleDTO> postResponseList = new ArrayList<>();
-        for (Post post : postList) {
-            PostSimpleDTO dto = new PostSimpleDTO(post);
-            postResponseList.add(dto);
-        }
-        return postResponseList;
+        return postList.stream()
+                .map(PostSimpleDTO::new)
+                .collect(Collectors.toList());
     }
 
     // 정렬 옵션
@@ -117,26 +114,41 @@ public class PostService {
     }
 
     // 전체 글 조회
-    public List<PostSimpleDTO> getPostList(String sort, Long category){
-        List<Post> postList = postRepository.findAll(getSort(sort));
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public List<PostSimpleDTO> getPostList(String sort, Long categoryId){
+        List<Post> postList;
+
+        if (categoryId != null) {
+            Category category = categoryRepository.findById(categoryId)
+                    .orElseThrow(() -> new RuntimeException("존재하지 않는 category ID 입니다."));
+
+            postList = postRepository.findByCategory(category, getSort(sort));
+        }
+        else { postList = postRepository.findAll(getSort(sort)); }
+
         return postListToSimpleDTO(postList);
     }
 
     // 인증 유저 글 조회
-    public List<PostSimpleDTO> getCertPostsList(String sort, Long category){
+    public List<PostSimpleDTO> getCertPostsList(String sort, Long categoryId){
         List<MemberEntity> certMembers = memberRepository.findByBadgeTrue();
         if(certMembers.isEmpty()){
             throw new RuntimeException("인증 user가 존재하지 않습니다.");
         }
 
-        List<Post> certPostsList = new ArrayList<>();
-        for (MemberEntity member : certMembers) {
-            List<Post> posts = postRepository.findByMemberEntity(member);
-            certPostsList.addAll(posts);
-        }
-        if(certPostsList.isEmpty()){
-            throw new RuntimeException("인증 user post가 존재하지 않습니다.");
-        }
+        List<Post> certPostsList = certMembers.stream()
+                .flatMap(member -> {
+                    if (categoryId != null) {
+                        Category category = categoryRepository.findById(categoryId)
+                                .orElseThrow(() -> new RuntimeException("존재하지 않는 category ID 입니다."));
+                        return postRepository.findByCategoryAndMemberEntity(category, member).stream();
+                    } else {
+                        return postRepository.findByMemberEntity(member).stream();
+                    }
+                })
+                .collect(Collectors.toList());
+
+        if(certPostsList.isEmpty()){ throw new RuntimeException("인증 user post가 존재하지 않습니다."); }
 
         certPostsList.sort(getComparator(sort));
 
@@ -150,11 +162,9 @@ public class PostService {
 
         List<Post> myPostsList = postRepository.findByMemberEntity(memberEntity);
 
-        List<MyPostDTO> myPostDTOsList = new ArrayList<>();
-        for (Post post : myPostsList) {
-            myPostDTOsList.add(new MyPostDTO(post));
-        }
-        return myPostDTOsList;
+        return myPostsList.stream()
+                .map(MyPostDTO::new)
+                .collect(Collectors.toList());
     }
 
     @Transactional
