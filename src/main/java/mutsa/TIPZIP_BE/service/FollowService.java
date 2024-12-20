@@ -5,6 +5,7 @@ import mutsa.TIPZIP_BE.entity.Follow;
 import mutsa.TIPZIP_BE.entity.MemberEntity;
 import mutsa.TIPZIP_BE.repository.FollowRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -23,5 +24,12 @@ public class FollowService {
     public int getFollowerCount(MemberEntity member){
         //현재 사용사를 팔로우하고 있는 유저 수 반환
         return followRepository.countByFollowing(member);
+    }
+    @Transactional
+    public void unfollow(MemberEntity follower, MemberEntity following) {
+        if (!followRepository.existsByFollowerAndFollowing(follower, following)) {
+            throw new IllegalArgumentException("팔로우 관계가 존재하지 않습니다.");
+        }
+        followRepository.deleteByFollowerAndFollowing(follower, following);
     }
 }
