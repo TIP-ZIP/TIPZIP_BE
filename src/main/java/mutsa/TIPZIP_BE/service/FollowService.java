@@ -11,12 +11,17 @@ import org.springframework.stereotype.Service;
 public class FollowService {
     private final FollowRepository followRepository;
     public void follow(MemberEntity follower, MemberEntity following) {
-        // 1️⃣ 중복 확인
         if (followRepository.existsByFollowerAndFollowing(follower, following)) {
             throw new IllegalArgumentException("이미 팔로우 중입니다.");
         }
-        // 2️⃣ 팔로우 생성
         Follow follow = new Follow(follower, following);
         followRepository.save(follow);
+    }
+    public int getFollowingCount(MemberEntity member){
+        return followRepository.countByFollower(member);
+    }
+    public int getFollowerCount(MemberEntity member){
+        //현재 사용사를 팔로우하고 있는 유저 수 반환
+        return followRepository.countByFollowing(member);
     }
 }
