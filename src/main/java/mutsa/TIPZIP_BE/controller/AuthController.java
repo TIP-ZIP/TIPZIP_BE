@@ -8,6 +8,7 @@ import mutsa.TIPZIP_BE.repository.MemberRepository;
 import mutsa.TIPZIP_BE.service.GoogleAuthService;
 import mutsa.TIPZIP_BE.service.KakaoAuthService;
 import mutsa.TIPZIP_BE.service.MemberService;
+import mutsa.TIPZIP_BE.service.MyPageService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,12 +34,14 @@ public class AuthController {
     private final KakaoAuthService kakaoAuthService;
     private final JwtTokenProvider jwtTokenProvider;
     private final GoogleAuthService googleAuthService;
-    public AuthController(MemberService memberService, KakaoAuthService kakaoAuthService, JwtTokenProvider jwtTokenProvider, GoogleAuthService googleAuthService, MemberRepository memberRepository) {
+    private final MyPageService myPageService;
+    public AuthController(MemberService memberService, KakaoAuthService kakaoAuthService, JwtTokenProvider jwtTokenProvider, GoogleAuthService googleAuthService, MemberRepository memberRepository,MyPageService myPageService) {
         this.memberService=memberService;
         this.kakaoAuthService = kakaoAuthService;
         this.jwtTokenProvider = jwtTokenProvider;
         this.googleAuthService = googleAuthService;
         this.memberRepository = memberRepository;
+        this.myPageService = myPageService;
     }
 
     @PostMapping("/login")
@@ -122,24 +125,17 @@ public class AuthController {
     }
     @PostMapping("/username")
     public ResponseEntity<?> username(@RequestBody Map<String, String> request,@RequestHeader("Authorization") String token) {
-        String accessToken=token.replace("Bearer ", "");
-        boolean istoken=jwtTokenProvider.validateToken(accessToken);
-        if (!istoken){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("유효하지 않은 엑세스 토큰입니다.");
+        try {
+            String username = request.get("username");
+            if (username == null||username.isEmpty()) {
+                return ResponseEntity.badRequest().body("유저네임을 입력해주세요");
+            }
+            myPageService.updateUsername(token, username);
+            return ResponseEntity.ok("유저네임이 설정되었습니다.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류가 발생했습니다.");
         }
-        String username = request.get("username");
-        // 이메일 추출
-        String email = jwtTokenProvider.getEmailFromToken(accessToken);
-        if (username == null||username.isEmpty()) {
-            return ResponseEntity.badRequest().body("유저네임을 입력해주세요");
-        }
-        else if (memberRepository.existsByUsername(username)) {//유저네임 중복성 검사
-            return ResponseEntity.badRequest().body("유저네임이 중복됩니다.");
-        }
-        MemberEntity memberEntity=memberRepository.findByEmail(email)
-                .orElseThrow(()->new RuntimeException("사용자를 찾을 수 없습니다"));
-        memberEntity.setUsername(username);
-        //memberRepository.save(memberEntity);
-        return ResponseEntity.ok(memberRepository.save(memberEntity));
     }
 }
