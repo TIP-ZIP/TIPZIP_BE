@@ -37,7 +37,10 @@ public class MyPageService {
         String email=jwtTokenProvider.getEmailFromToken(token.replace("Bearer ", ""));
         MemberEntity memberEntity = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
-
+        //유저네임 중복성 검사
+        if(memberRepository.existsByUsername(newUsername)){
+            throw new IllegalArgumentException("유저네임이 중복되었습니다.");
+        }
         memberEntity.setUsername(newUsername);
         memberRepository.save(memberEntity);
     }
