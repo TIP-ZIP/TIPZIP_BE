@@ -7,6 +7,7 @@ import mutsa.TIPZIP_BE.dto.FolderDTO.FolderResponseDTO;
 import mutsa.TIPZIP_BE.dto.PostDTO.PostRequestsDTO;
 import mutsa.TIPZIP_BE.dto.PostDTO.PostResponseDTO;
 import mutsa.TIPZIP_BE.dto.PostDTO.PostSimpleDTO;
+import mutsa.TIPZIP_BE.entity.Folder;
 import mutsa.TIPZIP_BE.service.FolderService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,10 +37,16 @@ public class FolderController {
     }
 
     // PUT
-//    @PutMapping("/{id}")
-//    public ResponseEntity<?> modifyFolder(@PathVariable Long id) {
-//        Folder folder = folderService.get
-//
-//
-//    }
+    @PutMapping("/{id}")
+    public ResponseEntity<?> modifyFolder(@PathVariable Long id, @RequestHeader(value = "Authorization") String token, @RequestBody FolderRequestsDTO folderRequestsDTO) {
+        FolderResponseDTO folderResponseDTO = folderService.updateFolder(id, token, folderRequestsDTO);
+        return ResponseEntity.status(201).body(folderResponseDTO);
+    }
+
+    // DELETE
+    @DeleteMapping("{id}")
+    public ResponseEntity<?> deleteFolder(@PathVariable Long id) {
+        folderService.deleteFolder(id);
+        return ResponseEntity.status(200).build();
+    }
 }

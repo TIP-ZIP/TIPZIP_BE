@@ -35,16 +35,16 @@ public class FolderService {
     @Transactional
     public FolderResponseDTO createFolder(String token, FolderRequestsDTO folderRequestsDTO) {
 
-        // 현재 로그인 중인 사용자 정보 가져오기
+        // 현재 로그인 중인 사용자 정보
         MemberEntity member = memberService.getUserFromToken(token);
 
         Folder folder = Folder.builder()
-                .folder_name(folderRequestsDTO.folderName())
+                .folder_name(folderRequestsDTO.folder_name())
                 .memberEntity(member)
                 .build();
 
         folderRepository.save(folder);
-        log.info("Folder Id : {} is saved.", folder.getId());
+        log.info("Folder Id (name) : {} ({}) is saved.", folder.getId(), folder.getFolder_name());
 
         return new FolderResponseDTO(folder);
     }
@@ -66,10 +66,36 @@ public class FolderService {
             for (String categoryName : categoryList) {
                 Category category = categoryRepository.findByCategoryName(categoryName)
                         .orElseThrow(() -> new RuntimeException("존재하지 않는 category 입니다."));
-                long count = scrapRepository.countByCategory(category);
+                long count = scrapRepository.countByCategoryId(category.getId());
                 folderCountResponseDTOList.add(new FolderCountResponseDTO(categoryName, count));
             }
         }
         return folderCountResponseDTOList;
+    }
+
+    @Transactional
+    public FolderResponseDTO updateFolder(long id, String token, FolderRequestsDTO folderRequestsDTO) {
+        MemberEntity member = memberService.getUserFromToken(token);
+
+        Folder folder = folderRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 folder 입니다."));
+        
+        if ( member.equals(folder.getMemberEntity())){ // 사용자 검증
+            folder.setFolder_name(folderRequestsDTO.folder_name());
+            log.info("Folder Id : {} is changed.", folder.getId());
+        } else {
+            throw new RuntimeException("해당 folder 사용자가 아닙니다.");
+        }
+
+        // 더티 체킹
+        return new FolderResponseDTO(folder);
+    }
+
+    @Transactional
+    public void deleteFolder(Long folderId) {
+        Folder folder = folderRepository.findById(folderId)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 folder 입니다."));
+
+        folderRepository.delete(folder);
     }
 }
