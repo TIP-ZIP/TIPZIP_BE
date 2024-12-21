@@ -13,6 +13,7 @@ import mutsa.TIPZIP_BE.repository.MemberRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -168,7 +169,8 @@ public class MemberService {
         }
         return null;
     }
-
+    /*
+    @Transactional
     public MemberDTO getUserFromToken(String token) {
         //Bearer부분 제거
         String accessToken = token.replace("Bearer ", "");
@@ -189,5 +191,29 @@ public class MemberService {
         System.out.println("Service 반환 전 MemberDTO: " + memberDTO); // 디버깅
         //memberentity를 MemberDTO로 변환하여 반환
         return memberDTO;
+    }
+
+     */
+    @Transactional
+    public MemberEntity getUserFromToken(String token) {
+        //Bearer부분 제거
+        String accessToken = token.replace("Bearer ", "");
+
+        //토큰 유효성 검사
+        boolean istoken = jwtTokenProvider.validateToken(accessToken);
+        if (!istoken) {
+            throw new IllegalArgumentException("유효하지 않은 토큰입니다.");
+        }
+        //jwt에서 이메일 추출
+        String email = jwtTokenProvider.getEmailFromToken(accessToken);
+        if (email == null) {
+            throw new IllegalArgumentException("토큰에서 이메일을 추출할 수 없습니다");
+        }
+        //이메일 통해 DB에서 유저 정보 조회
+        MemberEntity memberEntity = memberRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("해당 유저를 찾을 수 없습니다"));
+//        MemberDTO memberDTO = MemberDTO.socialMemberDTO(memberEntity);
+//        System.out.println("Service 반환 전 MemberDTO: " + memberDTO); // 디버깅
+        //memberentity 반환
+        return memberEntity;
     }
 }
