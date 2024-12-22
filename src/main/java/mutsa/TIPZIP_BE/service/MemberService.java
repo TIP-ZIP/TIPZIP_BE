@@ -10,15 +10,9 @@ import mutsa.TIPZIP_BE.entity.MemberEntity;
 import mutsa.TIPZIP_BE.entity.OAuthProvider;
 import mutsa.TIPZIP_BE.jwt.JwtTokenProvider;
 import mutsa.TIPZIP_BE.repository.MemberRepository;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import mutsa.TIPZIP_BE.service.AuthService.RefreshTokenService;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.client.WebClient;
-
-import java.io.IOException;
-import java.lang.reflect.Member;
 
 @Service
 @RequiredArgsConstructor

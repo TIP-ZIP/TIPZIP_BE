@@ -1,4 +1,4 @@
-package mutsa.TIPZIP_BE.service;
+package mutsa.TIPZIP_BE.service.AuthService;
 
 import lombok.RequiredArgsConstructor;
 import mutsa.TIPZIP_BE.entity.MemberEntity;
@@ -26,8 +26,14 @@ public class RefreshTokenService {
         refreshToken.setCreatedAt(LocalDateTime.now());
 
         refreshTokenRepository.save(refreshToken);
-
     }
-
-
+    //리프레시토큰 조회 메서드
+    public RefreshToken getRefreshToken(String email) {
+        return refreshTokenRepository.findByMember_Email(email)
+                .orElseThrow(() -> new IllegalArgumentException("리프레시 토큰이 존재하지 않습니다."));
+    }
+    @Transactional
+    public void deleteRefreshToken(String email) {
+        refreshTokenRepository.deleteByMember_Email(email);
+    }
 }

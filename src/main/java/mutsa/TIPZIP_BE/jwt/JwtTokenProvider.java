@@ -1,9 +1,6 @@
 package mutsa.TIPZIP_BE.jwt;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -94,8 +91,16 @@ public class JwtTokenProvider {
                 Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))
         );
     }
-
-
-
-
+    public String getEmailFromExpiredToken(String token) {
+        try {
+            return Jwts.parserBuilder()
+                    .setSigningKey(getSecretKey()) // 토큰 서명에 사용된 키
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody()
+                    .getSubject(); // 이메일(또는 사용자 식별자) 반환
+        } catch (ExpiredJwtException e) {
+            return e.getClaims().getSubject(); // 만료된 토큰의 클레임에서 사용자 이메일 반환
+        }
+    }
 }

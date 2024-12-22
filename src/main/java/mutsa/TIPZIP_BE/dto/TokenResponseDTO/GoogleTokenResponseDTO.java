@@ -1,4 +1,4 @@
-package mutsa.TIPZIP_BE.dto;
+package mutsa.TIPZIP_BE.dto.TokenResponseDTO;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor //역직렬화 위한 기본 생성자
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class KakaoTokenResponseDTO {
+public class GoogleTokenResponseDTO {
     @JsonProperty("token_type")
     public String tokenType;
     @JsonProperty("access_token")

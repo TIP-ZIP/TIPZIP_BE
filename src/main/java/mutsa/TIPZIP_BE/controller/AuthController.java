@@ -1,14 +1,14 @@
 package mutsa.TIPZIP_BE.controller;
 
-import lombok.RequiredArgsConstructor;
 import mutsa.TIPZIP_BE.dto.MemberDTO;
 import mutsa.TIPZIP_BE.entity.MemberEntity;
+import mutsa.TIPZIP_BE.entity.RefreshToken;
 import mutsa.TIPZIP_BE.jwt.JwtTokenProvider;
 import mutsa.TIPZIP_BE.repository.MemberRepository;
-import mutsa.TIPZIP_BE.service.GoogleAuthService;
-import mutsa.TIPZIP_BE.service.KakaoAuthService;
-import mutsa.TIPZIP_BE.service.MemberService;
-import mutsa.TIPZIP_BE.service.MyPageService;
+import mutsa.TIPZIP_BE.service.*;
+import mutsa.TIPZIP_BE.service.AuthService.GoogleAuthService;
+import mutsa.TIPZIP_BE.service.AuthService.KakaoAuthService;
+import mutsa.TIPZIP_BE.service.AuthService.RefreshTokenService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,13 +35,21 @@ public class AuthController {
     private final JwtTokenProvider jwtTokenProvider;
     private final GoogleAuthService googleAuthService;
     private final MyPageService myPageService;
-    public AuthController(MemberService memberService, KakaoAuthService kakaoAuthService, JwtTokenProvider jwtTokenProvider, GoogleAuthService googleAuthService, MemberRepository memberRepository,MyPageService myPageService) {
+    private final RefreshTokenService refreshTokenService;
+    public AuthController(MemberService memberService,
+                          KakaoAuthService kakaoAuthService,
+                          JwtTokenProvider jwtTokenProvider,
+                          GoogleAuthService googleAuthService,
+                          MemberRepository memberRepository,
+                          MyPageService myPageService,
+                          RefreshTokenService refreshTokenService) {
         this.memberService=memberService;
         this.kakaoAuthService = kakaoAuthService;
         this.jwtTokenProvider = jwtTokenProvider;
         this.googleAuthService = googleAuthService;
         this.memberRepository = memberRepository;
         this.myPageService = myPageService;
+        this.refreshTokenService = refreshTokenService;
     }
 
     @PostMapping("/login")
@@ -101,24 +109,31 @@ public class AuthController {
         }
     }
     @PostMapping("/token_reissue")
-    public ResponseEntity<?> reissueAccessToken(@RequestBody Map<String, String> request) {
-        String refreshToken = request.get("refresh_token");
-
-        if (refreshToken == null) {
-            return ResponseEntity.badRequest().body("리프레시 토큰이 필요합니다.");
+    public ResponseEntity<?> reissueAccessToken(@RequestHeader("Authorization") String token) {
+        // Bearer 부분 제거
+        String accessToken = token.replace("Bearer ", "");
+        // 액세스 토큰의 유효성을 확인 (만료 확인)
+        if (jwtTokenProvider.validateToken(accessToken)) {
+            return ResponseEntity.badRequest().body("엑세스 토큰이 아직 유효합니다.");
         }
-
-        // 리프레시 토큰의 유효성 검사
-        if (!jwtTokenProvider.validateToken(refreshToken)) {
-            return ResponseEntity.status(401).body("유효하지 않은 리프레시 토큰입니다.");
+        // 만료된 엑세스 토큰에서 사용자 이메일 추출
+        String email;
+        try {
+            email = jwtTokenProvider.getEmailFromExpiredToken(accessToken); // 만료된 토큰에서 이메일 추출
+        } catch (Exception e) {
+            return ResponseEntity.status(401).body("유효하지 않은 액세스 토큰입니다.");
         }
+        // 데이터베이스에서 사용자 조회
+        MemberEntity memberEntity = memberRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
 
-        // 리프레시 토큰에서 사용자 정보 추출
-        String memberName = jwtTokenProvider.getEmailFromToken(refreshToken);
-
-        // 해당 사용자에 대한 새로운 액세스 토큰 발급
-        String newAccessToken = jwtTokenProvider.createToken(memberName, 3600); // 1시간 유효
-
+        // 데이터베이스에 저장된 리프레시 토큰 확인
+        RefreshToken refreshToken = refreshTokenService.getRefreshToken(email);
+        if (jwtTokenProvider.validateToken(refreshToken.getToken())) {
+            return ResponseEntity.status(403).body("리프레시 토큰이 유효하지 않습니다.");
+        }
+        // 새로운 액세스 토큰 생성
+        String newAccessToken = jwtTokenProvider.createToken(email, 3600); // 1시간 유효
         Map<String, String> response = new HashMap<>();
         response.put("access_token", newAccessToken);
         return ResponseEntity.ok(response);
@@ -136,6 +151,17 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류가 발생했습니다.");
+        }
+    }
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@RequestHeader("Authorization") String token) {
+        try{
+            String accessToken = token.replace("Bearer ", "");
+            String email=jwtTokenProvider.getEmailFromToken(accessToken);
+            refreshTokenService.deleteRefreshToken(email);
+            return ResponseEntity.ok("로그아웃 성공");
+        }catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("로그아웃 중 에러가 발생하였습니다.");
         }
     }
 }
