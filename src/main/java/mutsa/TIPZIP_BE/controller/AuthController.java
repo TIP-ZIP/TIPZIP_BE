@@ -1,12 +1,14 @@
 package mutsa.TIPZIP_BE.controller;
 
-import lombok.RequiredArgsConstructor;
 import mutsa.TIPZIP_BE.dto.MemberDTO;
 import mutsa.TIPZIP_BE.entity.MemberEntity;
 import mutsa.TIPZIP_BE.entity.RefreshToken;
 import mutsa.TIPZIP_BE.jwt.JwtTokenProvider;
 import mutsa.TIPZIP_BE.repository.MemberRepository;
 import mutsa.TIPZIP_BE.service.*;
+import mutsa.TIPZIP_BE.service.AuthService.GoogleAuthService;
+import mutsa.TIPZIP_BE.service.AuthService.KakaoAuthService;
+import mutsa.TIPZIP_BE.service.AuthService.RefreshTokenService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -6,6 +6,7 @@ import mutsa.TIPZIP_BE.dto.MyPageResponseDTO;
 import mutsa.TIPZIP_BE.entity.MemberEntity;
 import mutsa.TIPZIP_BE.jwt.JwtTokenProvider;
 import mutsa.TIPZIP_BE.repository.MemberRepository;
+import mutsa.TIPZIP_BE.service.AuthService.RefreshTokenService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 

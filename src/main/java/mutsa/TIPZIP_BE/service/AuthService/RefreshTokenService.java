@@ -1,4 +1,4 @@
-package mutsa.TIPZIP_BE.service;
+package mutsa.TIPZIP_BE.service.AuthService;
 
 import lombok.RequiredArgsConstructor;
 import mutsa.TIPZIP_BE.entity.MemberEntity;
