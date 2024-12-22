@@ -11,6 +11,7 @@ import java.util.Optional;
 public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long> {
     void deleteByMember(MemberEntity member);
     Optional<RefreshToken> findByMember_Email(String email);
+    void deleteByMember_Email(String email);
     //토큰 값으로 특정 refresh token검색
     Optional<RefreshToken> findByToken(String token);
 }
