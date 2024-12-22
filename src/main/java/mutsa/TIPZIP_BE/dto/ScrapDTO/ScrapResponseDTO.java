@@ -6,6 +6,6 @@ import mutsa.TIPZIP_BE.entity.Scrap;
 public record ScrapResponseDTO(long post_id, String folder, long category) {
 
     public ScrapResponseDTO(Scrap scrap) {
-        this(scrap.getPost().getId(), scrap.getFolder().getFolder_name(), scrap.getCategoryId());
+        this(scrap.getPost().getId(), scrap.getFolder().getFolderName(), scrap.getCategoryId());
     }
 }

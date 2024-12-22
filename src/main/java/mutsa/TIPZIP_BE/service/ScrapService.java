@@ -34,7 +34,7 @@ public class ScrapService {
         Post post = postRepository.findById(scrapRequestsDTO.post_id())
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 Post 입니다 : " + scrapRequestsDTO.post_id()));
 
-        Folder folder = folderRepository.findByFolder_name(scrapRequestsDTO.folder_name())
+        Folder folder = folderRepository.findByFolderName(scrapRequestsDTO.folder_name())
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 Folder 입니다 : " + scrapRequestsDTO.folder_name()));
 
         // 현재 로그인 중인 사용자 정보 가져오기
@@ -67,7 +67,7 @@ public class ScrapService {
     }
 
     public List<MyPostDTO> getScrapByFolder(String folderName, String token) {
-        Folder folder = folderRepository.findByFolder_name(folderName)
+        Folder folder = folderRepository.findByFolderName(folderName)
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 Folder 입니다 : " + folderName));
 
         MemberEntity member = memberService.getUserFromToken(token);
