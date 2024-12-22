@@ -32,4 +32,8 @@ public class RefreshTokenService {
         return refreshTokenRepository.findByMember_Email(email)
                 .orElseThrow(() -> new IllegalArgumentException("리프레시 토큰이 존재하지 않습니다."));
     }
+    @Transactional
+    public void deleteRefreshToken(String email) {
+        refreshTokenRepository.deleteByMember_Email(email);
+    }
 }
