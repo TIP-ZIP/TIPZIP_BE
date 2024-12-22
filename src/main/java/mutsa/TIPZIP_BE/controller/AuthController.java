@@ -151,4 +151,15 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류가 발생했습니다.");
         }
     }
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@RequestHeader("Authorization") String token) {
+        try{
+            String accessToken = token.replace("Bearer ", "");
+            String email=jwtTokenProvider.getEmailFromToken(accessToken);
+            refreshTokenService.deleteRefreshToken(email);
+            return ResponseEntity.ok("로그아웃 성공");
+        }catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("로그아웃 중 에러가 발생하였습니다.");
+        }
+    }
 }
