@@ -39,12 +39,12 @@ public class FolderService {
         MemberEntity member = memberService.getUserFromToken(token);
 
         Folder folder = Folder.builder()
-                .folder_name(folderRequestsDTO.folder_name())
+                .folderName(folderRequestsDTO.folder_name())
                 .memberEntity(member)
                 .build();
 
         folderRepository.save(folder);
-        log.info("Folder Id (name) : {} ({}) is saved.", folder.getId(), folder.getFolder_name());
+        log.info("Folder Id (name) : {} ({}) is saved.", folder.getId(), folder.getFolderName());
 
         return new FolderResponseDTO(folder);
     }
@@ -81,7 +81,7 @@ public class FolderService {
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 folder 입니다."));
         
         if ( member.equals(folder.getMemberEntity())){ // 사용자 검증
-            folder.setFolder_name(folderRequestsDTO.folder_name());
+            folder.setFolderName(folderRequestsDTO.folder_name());
             log.info("Folder Id : {} is changed.", folder.getId());
         } else {
             throw new RuntimeException("해당 folder 사용자가 아닙니다.");

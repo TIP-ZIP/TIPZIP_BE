@@ -23,7 +23,7 @@ public class Folder {
     @Column(name="foder_id")
     private long id;
 
-    private String folder_name;
+    private String folderName;
 
     // 연관관계 매핑
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "folder")
