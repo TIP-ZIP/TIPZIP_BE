@@ -48,7 +48,6 @@ public class PostService {
                 .content(postRequestsDTO.content())
                 .link_url(postRequestsDTO.link_url())
                 .thumbnail_url(postRequestsDTO.thumbnail_url())
-                .scrap(false) // 스크랩 여부 default:false
                 .scrapCount(0)
                 .build();
 
@@ -164,6 +163,15 @@ public class PostService {
                 .map(MyPostDTO::new)
                 .collect(Collectors.toList());
     }
+
+
+//    @Transactional
+//    public void () {
+//
+//    }
+
+
+
 
     @Transactional
     public void deletePost(Long postId) {

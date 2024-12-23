@@ -50,7 +50,8 @@ public class ScrapService {
         scrapRepository.save(scrap);
         log.info("Scrap is added.");
         
-        // post의 scrap true로 변경하는 로직 추가
+        // post 에 scrap 관계 설정
+        post.setScrap(scrap);
 
         return new ScrapResponseDTO(scrap);
     }
@@ -90,6 +91,8 @@ public class ScrapService {
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 Post 입니다 : " + scrapRequestsDTO.post_id()));;
 
         ScrapId scrapId = new ScrapId(member.getUser_id(), post.getId());
+        // post 에 scrap 관계 해제
+        post.setScrap(null);
         scrapRepository.deleteById(scrapId);
     }
 }
