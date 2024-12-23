@@ -28,7 +28,7 @@ public class SecurityConfig {
         http
                 .csrf().disable()// CSRF 비활성화
                 .authorizeRequests()
-                .requestMatchers("/","/auth/","/auth/login","/posts","/search","/auth/token_reissue").permitAll()
+                .requestMatchers("/","/auth/","/auth/login","/posts","/search","/auth/token_reissue","search").permitAll()
                 .requestMatchers("/auth/username","/posts/").authenticated()
                 .requestMatchers("/mypage/username").authenticated()
                 .requestMatchers(HttpMethod.GET,"/mypage/**").authenticated()
