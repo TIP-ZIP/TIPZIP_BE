@@ -11,6 +11,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Builder
 @NoArgsConstructor
@@ -50,13 +51,17 @@ public class Post {
     private String thumbnail_url;
     private long scrapCount; // 스크랩 수
 
-    public ArrayList<String> getPostTags(long postId) {
-        ArrayList<String> tags = new ArrayList<>();
 
-        for (post_tag postTag : postTags) {
-            tags.add(postTag.getTag().getTagName()); // Tag 객체에서 태그 이름 추출
-        }
-        return tags;
+    // scrap 여부
+    public boolean isScrapped() {
+        return this.scrap != null;
+    }
+
+    // postTags 로부터 tag 이름 목록 반환 method
+    public List<String> getPostTags() {
+        return postTags.stream()
+                .map(postTag -> postTag.getTag().getTagName())
+                .collect(Collectors.toList());
     }
 
 }
