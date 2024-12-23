@@ -57,6 +57,11 @@ public class Post {
         return this.scrap != null;
     }
 
+    // tag 추가
+    public void addPostTag(post_tag postTag) {
+        this.postTags.add(postTag);
+    }
+
     // postTags 로부터 tag 이름 목록 반환 method
     public List<String> getPostTags() {
         return postTags.stream()

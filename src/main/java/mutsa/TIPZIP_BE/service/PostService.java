@@ -60,11 +60,16 @@ public class PostService {
             Tag tag = tagRepository.findByTagName(tagName)
                     .orElseThrow(() -> new RuntimeException("존재하지 않는 태그입니다 : " + tagName));
 
-            // 중간 테이블 저장 (PostTag)
-            postTagRepository.save(post_tag.builder()
+            post_tag postTag = post_tag.builder()
                     .post(post)
                     .tag(tag)
-                    .build());
+                    .build();
+
+            // post의 배열에 tag 추가
+            post.addPostTag(postTag);
+
+            // 중간 테이블 저장 (PostTag)
+            postTagRepository.save(postTag);
         });
 
         return new PostResponseDTO(post);
