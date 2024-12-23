@@ -5,6 +5,8 @@ import mutsa.TIPZIP_BE.entity.MemberEntity;
 import mutsa.TIPZIP_BE.entity.Post;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -19,4 +21,17 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     // 유저별 post들 반환
     List<Post> findByMemberEntity(MemberEntity user);
     List<Post> findByCategoryAndMemberEntity(Category category, MemberEntity user);
+
+    // 제목 또는 내용에 검색어가 포함된 post데이터 반환(태그 없고 검색어만 존재시 사용)
+    List<Post> findByTitleContainingOrContentContaining(String title, String content);
+
+    //태그로 검색
+    //List<Post> findByTagsIn(List<String> tags);
+
+    // 검색어와 태그를 동시에 검색
+    //@Query("SELECT p FROM Post p JOIN p.postTags pt JOIN pt.tag t WHERE " +
+    //        "(p.title LIKE %:keyword% OR p.content LIKE %:keyword%) AND t.tagName IN :tags")
+    //List<Post> findByTitleContainingOrContentContainingAndTagsIn(@Param("keyword") String keyword,
+    //                                                             @Param("keyword")String Keyword,
+    //                                                             @Param("tags") List<String> tags);
 }
