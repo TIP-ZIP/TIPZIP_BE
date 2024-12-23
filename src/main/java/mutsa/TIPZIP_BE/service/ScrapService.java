@@ -49,6 +49,8 @@ public class ScrapService {
 
         scrapRepository.save(scrap);
         log.info("Scrap is added.");
+        
+        // post의 scrap true로 변경하는 로직 추가
 
         return new ScrapResponseDTO(scrap);
     }

@@ -26,7 +26,7 @@ public class Scrap {
     @JoinColumn(name = "user_id")
     private MemberEntity memberEntity;
     @Id
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
     private Post post;
 

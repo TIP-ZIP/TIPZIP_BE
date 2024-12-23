@@ -38,8 +38,8 @@ public class Post {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "post")
     private List<post_tag> postTags = new ArrayList<>();
     // scrap 매핑
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "post")
-    private List<Scrap> scraps = new ArrayList<>();
+    @OneToOne(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = true)
+    private Scrap scrap;
 
     private String title;
     @CreatedDate
@@ -48,7 +48,6 @@ public class Post {
     private String content;
     private String link_url;
     private String thumbnail_url;
-    private boolean scrap; // 스크랩 여부
     private long scrapCount; // 스크랩 수
 
     public ArrayList<String> getPostTags(long postId) {
