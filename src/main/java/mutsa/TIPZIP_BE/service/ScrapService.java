@@ -49,9 +49,9 @@ public class ScrapService {
 
         scrapRepository.save(scrap);
         log.info("Scrap is added.");
-        
+
         // post 에 scrap 관계 설정
-        post.setScrap(scrap);
+        post.addScrap(scrap);
 
         return new ScrapResponseDTO(scrap);
     }

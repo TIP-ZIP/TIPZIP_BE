@@ -57,8 +57,16 @@ public class Post {
         return this.scrap != null;
     }
 
+    // scrap 추가
+    public void addScrap(Scrap scrap) {
+        this.scrap = scrap;
+    }
+
     // tag 추가
     public void addPostTag(post_tag postTag) {
+        if (this.postTags == null) {
+            this.postTags = new ArrayList<>();
+        }
         this.postTags.add(postTag);
     }
 

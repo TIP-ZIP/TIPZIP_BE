@@ -65,11 +65,11 @@ public class PostService {
                     .tag(tag)
                     .build();
 
-            // post의 배열에 tag 추가
-            post.addPostTag(postTag);
-
             // 중간 테이블 저장 (PostTag)
             postTagRepository.save(postTag);
+
+            // post의 배열에 tag 추가
+            post.addPostTag(postTag);
         });
 
         return new PostResponseDTO(post);
