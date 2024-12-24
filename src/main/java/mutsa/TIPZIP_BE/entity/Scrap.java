@@ -15,17 +15,18 @@ import java.util.List;
 @Data
 @Entity
 @Table(name = "Scrap")
-@IdClass(ScrapId.class)
 public class Scrap {
 
-    private long categoryId;
-
-    // 연관관계 매핑이자 Id
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="scrap_id")
+    private long id;
+
+    // 연관관계 매핑
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private MemberEntity memberEntity;
-    @Id
+
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
     private Post post;
@@ -35,4 +36,6 @@ public class Scrap {
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumn(name = "folder_id", nullable = true)
     private Folder folder;
+
+    private long categoryId;
 }

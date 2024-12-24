@@ -92,11 +92,13 @@ public class ScrapService {
         MemberEntity member = memberService.getUserFromToken(token);
 
         Post post = postRepository.findById(scrapRequestsDTO.post_id())
-                .orElseThrow(() -> new RuntimeException("존재하지 않는 Post 입니다 : " + scrapRequestsDTO.post_id()));;
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 Post 입니다 : " + scrapRequestsDTO.post_id()));
 
-        ScrapId scrapId = new ScrapId(member.getUser_id(), post.getId());
+        Scrap scrap = scrapRepository.findByPostAndMemberEntity(post, member)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 Scrap 입니다 : " + scrapRequestsDTO.post_id()));
+
         // post 에 scrap 관계 해제
         post.setScrap(null);
-        scrapRepository.deleteById(scrapId);
+        scrapRepository.delete(scrap);
     }
 }
