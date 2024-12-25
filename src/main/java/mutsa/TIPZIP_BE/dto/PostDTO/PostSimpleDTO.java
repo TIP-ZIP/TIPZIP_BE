@@ -7,6 +7,6 @@ public record PostSimpleDTO(Long id, String author, boolean badge, String title,
 
     public PostSimpleDTO(Post post) {
         this(post.getId(), post.getMemberEntity().getUsername(), post.getMemberEntity().getBadge(),
-                post.getTitle(), post.isScrap(), post.getScrapCount(), post.getThumbnail_url());
+                post.getTitle(), post.isScrapped(), post.getScrapCount(), post.getThumbnail_url());
     }
 }

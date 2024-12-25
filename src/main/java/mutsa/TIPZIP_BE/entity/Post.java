@@ -11,6 +11,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Builder
 @NoArgsConstructor
@@ -38,8 +39,8 @@ public class Post {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "post")
     private List<post_tag> postTags = new ArrayList<>();
     // scrap 매핑
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "post")
-    private List<Scrap> scraps = new ArrayList<>();
+    @OneToOne(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = true)
+    private Scrap scrap;
 
     private String title;
     @CreatedDate
@@ -48,16 +49,32 @@ public class Post {
     private String content;
     private String link_url;
     private String thumbnail_url;
-    private boolean scrap; // 스크랩 여부
     private long scrapCount; // 스크랩 수
 
-    public ArrayList<String> getPostTags(long postId) {
-        ArrayList<String> tags = new ArrayList<>();
 
-        for (post_tag postTag : postTags) {
-            tags.add(postTag.getTag().getTagName()); // Tag 객체에서 태그 이름 추출
+    // scrap 여부
+    public boolean isScrapped() {
+        return this.scrap != null;
+    }
+
+    // scrap 추가
+    public void addScrap(Scrap scrap) {
+        this.scrap = scrap;
+    }
+
+    // tag 추가
+    public void addPostTag(post_tag postTag) {
+        if (this.postTags == null) {
+            this.postTags = new ArrayList<>();
         }
-        return tags;
+        this.postTags.add(postTag);
+    }
+
+    // postTags 로부터 tag 이름 목록 반환 method
+    public List<String> getPostTags() {
+        return postTags.stream()
+                .map(postTag -> postTag.getTag().getTagName())
+                .collect(Collectors.toList());
     }
 
 }

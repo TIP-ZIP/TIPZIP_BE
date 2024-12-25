@@ -6,6 +6,6 @@ import mutsa.TIPZIP_BE.entity.Post;
 public record MyPostDTO(Long id, String title, boolean scrap, long scrapCount, String thumbnail_url) {
 
     public MyPostDTO(Post post) {
-        this(post.getId(), post.getTitle(), post.isScrap(), post.getScrapCount(), post.getThumbnail_url());
+        this(post.getId(), post.getTitle(), post.isScrapped(), post.getScrapCount(), post.getThumbnail_url());
     }
 }

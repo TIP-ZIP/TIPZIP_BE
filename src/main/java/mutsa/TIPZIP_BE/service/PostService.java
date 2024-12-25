@@ -8,9 +8,7 @@ import mutsa.TIPZIP_BE.dto.PostDTO.MyPostDTO;
 import mutsa.TIPZIP_BE.dto.PostDTO.PostRequestsDTO;
 import mutsa.TIPZIP_BE.dto.PostDTO.PostResponseDTO;
 import mutsa.TIPZIP_BE.dto.PostDTO.PostSimpleDTO;
-import mutsa.TIPZIP_BE.entity.Category;
-import mutsa.TIPZIP_BE.entity.MemberEntity;
-import mutsa.TIPZIP_BE.entity.Post;
+import mutsa.TIPZIP_BE.entity.*;
 import mutsa.TIPZIP_BE.repository.*;
 import org.hibernate.query.Order;
 import org.springframework.data.domain.Sort;
@@ -50,7 +48,6 @@ public class PostService {
                 .content(postRequestsDTO.content())
                 .link_url(postRequestsDTO.link_url())
                 .thumbnail_url(postRequestsDTO.thumbnail_url())
-                .scrap(false) // 스크랩 여부 default:false
                 .scrapCount(0)
                 .build();
 
@@ -58,17 +55,22 @@ public class PostService {
         log.info("Post Id : {} is saved.", post.getId());
 
         // 태그 처리
-//        postRequestsDTO.tag().forEach(tagName -> {
-//            // 데이터베이스에서 태그 조회
-//            Tag tag = tagRepository.findByTagName(tagName)
-//                    .orElseThrow(() -> new RuntimeException("존재하지 않는 태그입니다 : " + tagName));
+        postRequestsDTO.tag().forEach(tagName -> {
+            // 데이터베이스에서 태그 조회
+            Tag tag = tagRepository.findByTagName(tagName)
+                    .orElseThrow(() -> new RuntimeException("존재하지 않는 태그입니다 : " + tagName));
+
+            post_tag postTag = post_tag.builder()
+                    .post(post)
+                    .tag(tag)
+                    .build();
 
             // 중간 테이블 저장 (PostTag)
-//            postTagRepository.save(post_tag.builder()
-//                    .post(post)
-//                    .tag(tag)
-//                    .build());
-//        });
+            postTagRepository.save(postTag);
+
+            // post의 배열에 tag 추가
+            post.addPostTag(postTag);
+        });
 
         return new PostResponseDTO(post);
     }
@@ -166,6 +168,15 @@ public class PostService {
                 .map(MyPostDTO::new)
                 .collect(Collectors.toList());
     }
+
+
+//    @Transactional
+//    public void () {
+//
+//    }
+
+
+
 
     @Transactional
     public void deletePost(Long postId) {
