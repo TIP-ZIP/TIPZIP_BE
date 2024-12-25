@@ -153,6 +153,20 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류가 발생했습니다.");
         }
     }
+    @GetMapping("/username/exists")
+    public ResponseEntity<?> checkUsernameExists(@RequestParam String username) {
+        try {
+            // 유저네임 중복 검사
+            myPageService.checkUsernameExists(username);
+            return ResponseEntity.ok("사용 가능한 유저네임입니다.");
+        } catch (IllegalArgumentException e) {
+            // 중복된 경우 예외 메시지 반환
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        } catch (Exception e) {
+            // 기타 서버 오류 처리
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류가 발생했습니다.");
+        }
+    }
     @PostMapping("/logout")
     public ResponseEntity<?> logout(@RequestHeader("Authorization") String token) {
         try{
