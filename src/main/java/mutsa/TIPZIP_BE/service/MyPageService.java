@@ -5,6 +5,7 @@ import mutsa.TIPZIP_BE.S3Storage.S3Service;
 import mutsa.TIPZIP_BE.dto.MyPageResponseDTO;
 import mutsa.TIPZIP_BE.entity.MemberEntity;
 import mutsa.TIPZIP_BE.jwt.JwtTokenProvider;
+import mutsa.TIPZIP_BE.repository.FollowRepository;
 import mutsa.TIPZIP_BE.repository.MemberRepository;
 import mutsa.TIPZIP_BE.service.AuthService.RefreshTokenService;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ public class MyPageService {
     private final JwtTokenProvider jwtTokenProvider;
     private final RefreshTokenService refreshTokenService;
     private final S3Service s3Service;
+    private final FollowRepository followRepository;
     public MyPageResponseDTO getMyPage(String token){
         String email=jwtTokenProvider.getEmailFromToken(token.replace("Bearer ", ""));
         MemberEntity memberEntity = memberRepository.findByEmail(email)
@@ -26,12 +28,13 @@ public class MyPageService {
 
         //아래는 예시이며, post, follow관련 로직 구현 후 수정필요.
         //int postCount = postRepository.countByUserId(memberEntity.getUser_id()); // 게시글 수
-        //int followerCount = followerRepository.countFollowers(memberEntity.getUser_id()); // 팔로워 수
-        //int followingCount = followerRepository.countFollowing(memberEntity.getUser_id()); // 팔로잉 수
+        int followerCount = followRepository.countByFollowing(memberEntity); // 팔로워 수
+        int followingCount = followRepository.countByFollower(memberEntity); // 팔로잉 수
 
-        MyPageResponseDTO myPageResponseDTO = MyPageResponseDTO.fromMemberEntity(memberEntity);
+        //MyPageResponseDTO myPageResponseDTO = MyPageResponseDTO.fromMemberEntity(memberEntity);
 
         //MyPageResponseDTO myPageResponseDTO = MyPageResponseDTO.fromMemberEntity(memberEntity, postCount, followerCount, followingCount);
+        MyPageResponseDTO myPageResponseDTO = MyPageResponseDTO.fromMemberEntity(memberEntity,followerCount, followingCount);
         return myPageResponseDTO;
     }
     public void updateUsername(String token, String newUsername){
@@ -89,8 +92,8 @@ public class MyPageService {
                 .orElseThrow(()->new IllegalArgumentException("해당 유저를 찾을 수 없습니다."));
         //아래는 예시이며, post, follow관련 로직 구현 후 수정필요.
         //int postCount = postRepository.countByUserId(memberEntity.getUser_id()); // 게시글 수
-        //int followerCount = followerRepository.countFollowers(memberEntity.getUser_id()); // 팔로워 수
-        //int followingCount = followerRepository.countFollowing(memberEntity.getUser_id()); // 팔로잉 수
-        return MyPageResponseDTO.fromMemberEntity(memberEntity);
+        int followerCount = followRepository.countByFollowing(memberEntity);  // 팔로워 수
+        int followingCount = followRepository.countByFollower(memberEntity); // 팔로잉 수
+        return MyPageResponseDTO.fromMemberEntity(memberEntity,followerCount, followingCount);
     }
 }
