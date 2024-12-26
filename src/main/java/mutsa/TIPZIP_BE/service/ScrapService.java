@@ -98,7 +98,7 @@ public class ScrapService {
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 Scrap 입니다 : " + scrapRequestsDTO.post_id()));
 
         // post 에 scrap 관계 해제
-        post.setScrap(null);
+        post.removeScrap(scrap);
         scrapRepository.delete(scrap);
     }
 }

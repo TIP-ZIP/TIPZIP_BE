@@ -60,6 +60,12 @@ public class Post {
     // scrap 추가
     public void addScrap(Scrap scrap) {
         this.scrap = scrap;
+        this.scrapCount++;
+    }
+    // scrap 삭제
+    public void removeScrap(Scrap scrap) {
+        this.scrap = null;
+        this.scrapCount--;
     }
 
     // tag 추가
