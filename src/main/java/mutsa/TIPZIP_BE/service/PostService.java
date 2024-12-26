@@ -138,7 +138,7 @@ public class PostService {
 
         return postListToSimpleDTO(postList);
     }
-
+/*
     // 팔로잉 유저 글 조회
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public List<PostSimpleDTO> getFollowingPostsList(String token, String sort, Long categoryId){
@@ -194,6 +194,8 @@ public class PostService {
 
         return postListToSimpleDTO(certPostsList);
     }
+
+ */
 
     // 마이페이지 글 조회
     public List<MyPostDTO> getMyposts(Long id){

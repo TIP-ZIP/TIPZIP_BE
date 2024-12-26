@@ -36,7 +36,7 @@ public class PostController {
         List<PostSimpleDTO> postSimpleDTOSs= postService.getPostList(sort, category);
         return ResponseEntity.status(HttpStatus.OK).body(postSimpleDTOSs);
     }
-
+/*
     // 팔로잉 유저
     @GetMapping("/following")
     public ResponseEntity<?> getFollowingPostsList(@RequestHeader(value = "Authorization") String token, @RequestParam(defaultValue = "recent") String sort, @RequestParam(required = false) Long category) {
@@ -50,6 +50,8 @@ public class PostController {
         List<PostSimpleDTO> postSimpleDTOSs= postService.getCertPostsList(sort, category);
         return ResponseEntity.status(HttpStatus.OK).body(postSimpleDTOSs);
     }
+
+ */
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getOnePost(@PathVariable Long id) {
