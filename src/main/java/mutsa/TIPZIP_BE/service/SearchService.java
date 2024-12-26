@@ -16,17 +16,15 @@ public class SearchService {
     private final PostRepository postRepository;
     @Transactional
     public List<PostResponseDTO> searchPosts(String searchKeyword,List<String> tags){
-        if(searchKeyword==null || searchKeyword.isEmpty() && (tags == null || tags.isEmpty())){
+        System.out.println("searchKeyword: " + searchKeyword);
+        System.out.println("tags: " + (tags == null ? "null" : tags));
+        if((searchKeyword==null || searchKeyword.isEmpty()) && (tags == null || tags.isEmpty())){
             throw new IllegalArgumentException("검색어 또는 태그를 입력해주세요");
         }
-
-        List<Post>posts=postRepository.findByTitleContainingOrContentContaining(searchKeyword, searchKeyword);
-        // 검색 로직
-        /*
         List<Post> posts;
 
-        if (tags != null && !tags.isEmpty() && (searchKeyword != null && !searchKeyword.isBlank())) {
-            // 검색어와 태그 모두가 있는 경우
+        if ((searchKeyword != null && !searchKeyword.isEmpty()) && tags != null && !tags.isEmpty()) {
+            // 검색어와 태그 모두가 있는 경우(검색어,태그 모두 충족하는 글만 반환)
             posts = postRepository.findByTitleContainingOrContentContainingAndTagsIn(
                     searchKeyword, searchKeyword, tags
             );
@@ -37,12 +35,8 @@ public class SearchService {
             // 검색어만 있는 경우
             posts = postRepository.findByTitleContainingOrContentContaining(searchKeyword, searchKeyword);
         }
-
-         */
         return posts.stream()
                 .map(PostResponseDTO::new)
                 .collect(Collectors.toList());
-
-
     }
 }
