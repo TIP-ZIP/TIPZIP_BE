@@ -37,16 +37,17 @@ public class PostController {
         return ResponseEntity.status(HttpStatus.OK).body(postSimpleDTOSs);
     }
 
-    // follow entity 생기면 추가
-//    @GetMapping("/following")
-//    public ResponseEntity<?> getFollowingPostsList() {
-//
-//    }
+    // 팔로잉 유저
+    @GetMapping("/following")
+    public ResponseEntity<?> getFollowingPostsList(@RequestHeader(value = "Authorization") String token, @RequestParam(defaultValue = "recent") String sort, @RequestParam(required = false) Long category) {
+        List<PostSimpleDTO> postSimpleDTOSs= postService.getFollowingPostsList(token, sort, category);
+        return ResponseEntity.status(HttpStatus.OK).body(postSimpleDTOSs);
+    }
 
     // 인증된 유저
     @GetMapping("/cert")
     public ResponseEntity<?> getCertPostsList(@RequestParam(defaultValue = "recent") String sort, @RequestParam(required = false) Long category) {
-        List<PostSimpleDTO> postSimpleDTOSs= postService.getPostList(sort, category);
+        List<PostSimpleDTO> postSimpleDTOSs= postService.getCertPostsList(sort, category);
         return ResponseEntity.status(HttpStatus.OK).body(postSimpleDTOSs);
     }
 

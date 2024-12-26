@@ -33,6 +33,7 @@ public class PostService {
     private final PostTagRepository postTagRepository;
     private final MemberRepository memberRepository;
     private final MemberService memberService;
+    private final FollowRepository followRepository;
 
     @Transactional
     public PostResponseDTO createPost(String token, PostRequestsDTO postRequestsDTO) {
@@ -138,7 +139,37 @@ public class PostService {
         return postListToSimpleDTO(postList);
     }
 
+    // 팔로잉 유저 글 조회
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public List<PostSimpleDTO> getFollowingPostsList(String token, String sort, Long categoryId){
+        MemberEntity follower = memberService.getUserFromToken(token);
+
+        List<MemberEntity> followingMembers = followRepository.findByFollower_id(follower.getUser_id());
+        if(followingMembers.isEmpty()){
+            throw new RuntimeException("팔로잉 하는 유저가 존재하지 않습니다.");
+        }
+
+        List<Post> followingPostsList = followingMembers.stream()
+                .flatMap(member -> {
+                    if (categoryId != null) {
+                        Category category = categoryRepository.findById(categoryId)
+                                .orElseThrow(() -> new RuntimeException("존재하지 않는 category ID 입니다."));
+                        return postRepository.findByCategoryAndMemberEntity(category, member).stream();
+                    } else {
+                        return postRepository.findByMemberEntity(member).stream();
+                    }
+                })
+                .collect(Collectors.toList());
+
+        if(followingPostsList.isEmpty()){ throw new RuntimeException("팔로잉 user post가 존재하지 않습니다."); }
+
+        followingPostsList.sort(getComparator(sort));
+
+        return postListToSimpleDTO(followingPostsList);
+    }
+
     // 인증 유저 글 조회
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public List<PostSimpleDTO> getCertPostsList(String sort, Long categoryId){
         List<MemberEntity> certMembers = memberRepository.findByBadgeTrue();
         if(certMembers.isEmpty()){
