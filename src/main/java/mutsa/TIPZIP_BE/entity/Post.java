@@ -72,9 +72,15 @@ public class Post {
 
     // postTags 로부터 tag 이름 목록 반환 method
     public List<String> getPostTags() {
-        return postTags.stream()
-                .map(postTag -> postTag.getTag().getTagName())
-                .collect(Collectors.toList());
+
+        if (this.postTags == null) {
+            return null;
+        }
+        else {
+            return postTags.stream()
+                    .map(postTag -> postTag.getTag().getTagName())
+                    .collect(Collectors.toList());
+        }
     }
 
 }
