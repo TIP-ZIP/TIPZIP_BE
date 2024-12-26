@@ -8,6 +8,7 @@ import mutsa.TIPZIP_BE.repository.MemberRepository;
 import mutsa.TIPZIP_BE.service.*;
 import mutsa.TIPZIP_BE.service.AuthService.GoogleAuthService;
 import mutsa.TIPZIP_BE.service.AuthService.KakaoAuthService;
+import mutsa.TIPZIP_BE.service.AuthService.NaverAuthService;
 import mutsa.TIPZIP_BE.service.AuthService.RefreshTokenService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -28,7 +29,7 @@ public class AuthController {
     @Value("${spring.kakao.redirect_uri}")
     private String KAKAO_REDIRECT_URI;
 
-    @Value("${spring.kakao.client-secret")
+    @Value("${spring.kakao.client-secret}")
     private String KAKAO_CLIENT_SECRET;
     private final MemberService memberService;
     private final KakaoAuthService kakaoAuthService;
@@ -36,13 +37,15 @@ public class AuthController {
     private final GoogleAuthService googleAuthService;
     private final MyPageService myPageService;
     private final RefreshTokenService refreshTokenService;
+    private final NaverAuthService naverAuthService;
     public AuthController(MemberService memberService,
                           KakaoAuthService kakaoAuthService,
                           JwtTokenProvider jwtTokenProvider,
                           GoogleAuthService googleAuthService,
                           MemberRepository memberRepository,
                           MyPageService myPageService,
-                          RefreshTokenService refreshTokenService) {
+                          RefreshTokenService refreshTokenService,
+                          NaverAuthService naverAuthService) {
         this.memberService=memberService;
         this.kakaoAuthService = kakaoAuthService;
         this.jwtTokenProvider = jwtTokenProvider;
@@ -50,6 +53,7 @@ public class AuthController {
         this.memberRepository = memberRepository;
         this.myPageService = myPageService;
         this.refreshTokenService = refreshTokenService;
+        this.naverAuthService = naverAuthService;
     }
 
     @PostMapping("/login")
@@ -74,8 +78,13 @@ public class AuthController {
                 System.out.println("Access Token: " + kakaoAccessToken);
                 memberDTO=memberService.getMemberFromKakao(kakaoAccessToken);
                 break;
-            case "NAVER":
-                return ResponseEntity.badRequest().body("Naver login 은 아직 구현전ㅜㅜ");
+            case "naver":
+                //네이버 인가코드를 통해 엑세스 토큰을 받아
+                System.out.println("Received social provider: " + socialProvider);
+                String naverAccessToken= naverAuthService.getAccessTokenFromNaver(authorizationcode);
+                System.out.println("Access Token: " + naverAccessToken);
+                memberDTO=memberService.getMemberFromNaver(naverAccessToken);
+                break;
             case "google":
                 //구글 인가코드를 통해 엑세스 토큰을 받아옴
                 System.out.println("Received social provider: " + socialProvider);
