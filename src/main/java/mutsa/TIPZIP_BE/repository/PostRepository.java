@@ -25,13 +25,14 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     // 제목 또는 내용에 검색어가 포함된 post데이터 반환(태그 없고 검색어만 존재시 사용)
     List<Post> findByTitleContainingOrContentContaining(String title, String content);
 
-    //태그로 검색
-    //List<Post> findByTagsIn(List<String> tags);
+    // 태그로 검색 (Post와 Tag를 JOIN)
+    @Query("SELECT p FROM Post p JOIN p.postTags pt JOIN pt.tag t WHERE t.tagName IN :tags")
+    List<Post> findByTagsIn(List<String> tags);
 
     // 검색어와 태그를 동시에 검색
-    //@Query("SELECT p FROM Post p JOIN p.postTags pt JOIN pt.tag t WHERE " +
-    //        "(p.title LIKE %:keyword% OR p.content LIKE %:keyword%) AND t.tagName IN :tags")
-    //List<Post> findByTitleContainingOrContentContainingAndTagsIn(@Param("keyword") String keyword,
-    //                                                             @Param("keyword")String Keyword,
-    //                                                             @Param("tags") List<String> tags);
+    @Query("SELECT p FROM Post p JOIN p.postTags pt JOIN pt.tag t WHERE " +
+            "(p.title LIKE %:keyword% OR p.content LIKE %:keyword%) AND t.tagName IN :tags")
+    List<Post> findByTitleContainingOrContentContainingAndTagsIn(@Param("keyword") String keyword,
+                                                                 @Param("keyword")String Keyword,
+                                                                 @Param("tags") List<String> tags);
 }
