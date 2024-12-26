@@ -38,7 +38,7 @@ public class FolderController {
 
     // PUT
     @PutMapping("/{id}")
-    public ResponseEntity<?> modifyFolder(@PathVariable Long id, @RequestHeader(value = "Authorization") String token, @RequestBody FolderRequestsDTO folderRequestsDTO) {
+    public ResponseEntity<?> updateFolder(@PathVariable Long id, @RequestHeader(value = "Authorization") String token, @RequestBody FolderRequestsDTO folderRequestsDTO) {
         FolderResponseDTO folderResponseDTO = folderService.updateFolder(id, token, folderRequestsDTO);
         return ResponseEntity.status(201).body(folderResponseDTO);
     }

@@ -3,6 +3,8 @@ package mutsa.TIPZIP_BE.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import mutsa.TIPZIP_BE.dto.FolderDTO.FolderRequestsDTO;
+import mutsa.TIPZIP_BE.dto.FolderDTO.FolderResponseDTO;
 import mutsa.TIPZIP_BE.dto.MemberDTO;
 import mutsa.TIPZIP_BE.dto.PostDTO.MyPostDTO;
 import mutsa.TIPZIP_BE.dto.PostDTO.PostRequestsDTO;
@@ -36,7 +38,7 @@ public class PostService {
     public PostResponseDTO createPost(String token, PostRequestsDTO postRequestsDTO) {
 
         Category category = categoryRepository.findByCategoryName(postRequestsDTO.category())
-                .orElseThrow(() -> new RuntimeException("존재하지 않는 Category 입니다 : " + postRequestsDTO.category()));;
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 Category 입니다 : " + postRequestsDTO.category()));
 
         // 현재 로그인 중인 사용자 정보 가져오기
         MemberEntity member = memberService.getUserFromToken(token);
@@ -55,6 +57,12 @@ public class PostService {
         log.info("Post Id : {} is saved.", post.getId());
 
         // 태그 처리
+        setTag(postRequestsDTO, post);
+
+        return new PostResponseDTO(post);
+    }
+
+    private void setTag(PostRequestsDTO postRequestsDTO, Post post) {
         postRequestsDTO.tag().forEach(tagName -> {
             // 데이터베이스에서 태그 조회
             Tag tag = tagRepository.findByTagName(tagName)
@@ -71,8 +79,6 @@ public class PostService {
             // post의 배열에 tag 추가
             post.addPostTag(postTag);
         });
-
-        return new PostResponseDTO(post);
     }
 
 
@@ -114,6 +120,7 @@ public class PostService {
                 throw new RuntimeException("존재하지 않는 정렬 옵션입니다.");
         }
     }
+
 
     // 전체 글 조회
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
@@ -170,12 +177,33 @@ public class PostService {
     }
 
 
-//    @Transactional
-//    public void () {
-//
-//    }
+    // Post 수정
+    @Transactional
+    public PostResponseDTO updatePost(Long id, String token, PostRequestsDTO postRequestsDTO) {
+        Post post = getOnePost(id);
 
+        MemberEntity member = memberService.getUserFromToken(token);
+        if ( !member.equals(post.getMemberEntity())){ // 사용자 검증
+            throw new RuntimeException("해당 folder 사용자가 아닙니다.");
+        }
+        else { // update 진행
+            if (postRequestsDTO.title() != null) { post.setTitle(postRequestsDTO.title()); }
+            if (postRequestsDTO.category() != null) {
+                Category category = categoryRepository.findByCategoryName(postRequestsDTO.category())
+                        .orElseThrow(() -> new RuntimeException("존재하지 않는 Category 입니다 : " + postRequestsDTO.category()));
+                post.setCategory(category); }
+            if (postRequestsDTO.tag() != null) {
+                setTag(postRequestsDTO, post);
+            }
+            if (postRequestsDTO.content() != null) { post.setContent(postRequestsDTO.content()); }
+            if (postRequestsDTO.link_url() != null) { post.setLink_url(postRequestsDTO.link_url()); }
+            if (postRequestsDTO.thumbnail_url() != null) { post.setThumbnail_url(postRequestsDTO.thumbnail_url()); }
+        }
 
+        log.info("Post Id : {} is changed.", id);
+        // 더티 체킹
+        return new PostResponseDTO(post);
+    }
 
 
     @Transactional

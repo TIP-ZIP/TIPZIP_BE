@@ -1,6 +1,7 @@
 package mutsa.TIPZIP_BE.controller;
 
 import lombok.RequiredArgsConstructor;
+import mutsa.TIPZIP_BE.dto.FolderDTO.FolderResponseDTO;
 import mutsa.TIPZIP_BE.dto.PostDTO.MyPostDTO;
 import mutsa.TIPZIP_BE.dto.PostDTO.PostRequestsDTO;
 import mutsa.TIPZIP_BE.dto.PostDTO.PostResponseDTO;
@@ -64,12 +65,11 @@ public class PostController {
     }
 
     // PUT
-//    @PutMapping("/{id}")
-//    public ResponseEntity<?> modifyPost(@PathVariable Long id) {
-//        Post post = postService.getOnePost(id);
-//
-//
-//    }
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updatePost(@PathVariable Long id, @RequestHeader(value = "Authorization") String token, @RequestBody PostRequestsDTO postRequestsDTO) {
+        PostResponseDTO postResponseDTO = postService.updatePost(id, token, postRequestsDTO);
+        return ResponseEntity.status(201).body(postResponseDTO);
+    }
 
     // DELETE
     @DeleteMapping("{id}")
