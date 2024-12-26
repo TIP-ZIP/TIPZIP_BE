@@ -33,7 +33,7 @@ public class S3Controller {
 
         try {
             String imageUrl = s3Service.uploadToS3(multipartFile);
-//            log.info("upload success");
+            log.info("upload success");
             response.put("S3url", imageUrl);
 
             return ResponseEntity
