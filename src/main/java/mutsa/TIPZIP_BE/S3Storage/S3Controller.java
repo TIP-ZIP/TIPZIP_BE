@@ -21,12 +21,13 @@ import java.util.UUID;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/uploadImageFile")
+@RequestMapping("/S3")
 public class S3Controller {
 
     private final S3Service s3Service;
 
-    @PostMapping
+    // 등록
+    @PostMapping("/uploadImageFile")
     public ResponseEntity<?> uploadImage(@RequestParam("file") MultipartFile multipartFile) {
         Map<String, String> response = new HashMap<>();
 
@@ -43,8 +44,8 @@ public class S3Controller {
         }
     }
 
-    // 로컬 테스트용
-    @DeleteMapping
+    // 삭제
+    @DeleteMapping("/deleteImageFile")
     public ResponseEntity<?> deleteImage(@RequestParam("imageUrl") String imageUrl) {
         s3Service.deleteImageFromS3(imageUrl);
         return ResponseEntity.ok(null);

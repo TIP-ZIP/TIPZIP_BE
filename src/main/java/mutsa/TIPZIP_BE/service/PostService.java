@@ -138,6 +138,21 @@ public class PostService {
         return postListToSimpleDTO(postList);
     }
 
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public List<PostSimpleDTO> getFollowingPostsList(String sort, Long categoryId){
+        List<Post> postList;
+
+        if (categoryId != null) {
+            Category category = categoryRepository.findById(categoryId)
+                    .orElseThrow(() -> new RuntimeException("존재하지 않는 category ID 입니다."));
+
+            postList = postRepository.findByCategory(category, getSort(sort));
+        }
+        else { postList = postRepository.findAll(getSort(sort)); }
+
+        return postListToSimpleDTO(postList);
+    }
+
     // 인증 유저 글 조회
     public List<PostSimpleDTO> getCertPostsList(String sort, Long categoryId){
         List<MemberEntity> certMembers = memberRepository.findByBadgeTrue();
