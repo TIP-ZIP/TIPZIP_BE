@@ -25,11 +25,12 @@ public class NaverAuthService {
     //프론트에서 보낸 인가코드 이용해 엑세스 토큰 발급
     public String getAccessTokenFromNaver(String authorizationcode) {
         WebClient webClient = WebClient.create();
+        String state="test";//프론트에서 STATE를 고정된 값인 test로 설정함에 따라 백도 이와 같이 설정
         System.out.println("getAccessTokenFromNaver진입성공");
 
         String uri = String.format(
-                "https://nid.naver.com/oauth2.0/token?grant_type=%s&client_id=%s&client_secret=%s&redirect_uri=%s&code=%s",
-                GRANT_TYPE, NAVER_CLIENT_ID,NAVER_CLIENT_SECRET, NAVER_REDIRECT_URI,authorizationcode
+                "https://nid.naver.com/oauth2.0/token?grant_type=%s&client_id=%s&client_secret=%s&redirect_uri=%s&code=%s&state=%s",
+                GRANT_TYPE, NAVER_CLIENT_ID,NAVER_CLIENT_SECRET, NAVER_REDIRECT_URI,authorizationcode,state
         );
         System.out.println(uri);
 
