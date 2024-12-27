@@ -20,7 +20,8 @@ import java.util.List;
 public class MemberEntity {
     @Id // 기본키(primary key)로 설정
     @GeneratedValue(strategy = GenerationType.IDENTITY) // 자동 증가 설정 (필요에 따라 변경 가능)
-    private Long user_id;
+    @Column(name = "user_id") // DB 컬럼 이름은 그대로 user_id
+    private Long userId;
 
     @Column
     private String username;
@@ -61,7 +62,7 @@ public class MemberEntity {
     // 소셜 회원용 생성 메서드 (비밀번호 없음)
     public static MemberEntity createSocialMember(MemberDTO socialMemberDTO) {
         MemberEntity memberEntity = new MemberEntity();
-        memberEntity.setUser_id(socialMemberDTO.getUser_id());
+        memberEntity.setUserId(socialMemberDTO.getUser_id());
         memberEntity.setEmail(socialMemberDTO.getEmail()); // 소셜에서 제공된 이메일
         memberEntity.setSocial_id(socialMemberDTO.getSocial_id()); // 소셜에서 제공된 이름 또는 ID
         memberEntity.setUsername(null); //최초 로그인시 닉네임입력 필요하므로 null로 설정
