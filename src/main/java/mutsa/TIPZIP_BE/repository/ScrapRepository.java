@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface ScrapRepository extends JpaRepository<Scrap, ScrapId> {
+public interface ScrapRepository extends JpaRepository<Scrap, Long> {
     Long countByFolder(Folder folder);
     Long countByCategoryId(long categoryId);
 

@@ -3,9 +3,12 @@ package mutsa.TIPZIP_BE.service;
 import com.nimbusds.jose.shaded.gson.JsonElement;
 import com.nimbusds.jose.shaded.gson.JsonObject;
 import com.nimbusds.jose.shaded.gson.JsonParser;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import mutsa.TIPZIP_BE.S3Storage.S3Service;
 import mutsa.TIPZIP_BE.dto.MemberDTO;
+import mutsa.TIPZIP_BE.dto.MemberResponseDTO;
+import mutsa.TIPZIP_BE.dto.PostDTO.PostResponseDTO;
 import mutsa.TIPZIP_BE.entity.MemberEntity;
 import mutsa.TIPZIP_BE.entity.OAuthProvider;
 import mutsa.TIPZIP_BE.jwt.JwtTokenProvider;
@@ -254,5 +257,16 @@ public class MemberService {
 //        System.out.println("Service 반환 전 MemberDTO: " + memberDTO); // 디버깅
         //memberentity 반환
         return memberEntity;
+    }
+
+    // 인증 유저로 전환 (배지 추가)
+    @Transactional
+    public MemberResponseDTO addBadge(String token) {
+        MemberEntity member = getUserFromToken(token);
+
+        member.setBadge(true);
+
+        // 더티 체킹
+        return new MemberResponseDTO(member);
     }
 }

@@ -55,8 +55,7 @@ public class PostController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getOnePost(@PathVariable Long id) {
-        Post post = postService.getOnePost(id);
-        PostResponseDTO postResponseDTO = new PostResponseDTO(post);
+        PostResponseDTO postResponseDTO = postService.getOnePostDTO(id);
 
         return ResponseEntity.status(200).body(postResponseDTO);
     }

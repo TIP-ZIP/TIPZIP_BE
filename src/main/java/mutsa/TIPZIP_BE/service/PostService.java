@@ -123,6 +123,14 @@ public class PostService {
     }
 
 
+    // 단일 글 조회
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public PostResponseDTO getOnePostDTO(Long id) {
+        Post post = getOnePost(id);
+
+        return new PostResponseDTO(post);
+    }
+
     // 전체 글 조회
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public List<PostSimpleDTO> getPostList(String sort, Long categoryId){
