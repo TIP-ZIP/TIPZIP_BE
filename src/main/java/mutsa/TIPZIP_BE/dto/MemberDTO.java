@@ -47,7 +47,7 @@ public class MemberDTO {
 
         System.out.println("MemberEntity 값: " + memberEntity); // 디버깅용 출력
         MemberDTO memberDTO = new MemberDTO();
-        memberDTO.setUser_id(memberEntity.getUser_id());
+        memberDTO.setUser_id(memberEntity.getUserId());
         System.out.println("User_id 설정: " + memberDTO.getUser_id());
         memberDTO.setEmail(memberEntity.getEmail());
         System.out.println("Email 설정: " + memberDTO.getEmail());

@@ -138,16 +138,29 @@ public class PostService {
 
         return postListToSimpleDTO(postList);
     }
-/*
+
     // 팔로잉 유저 글 조회
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public List<PostSimpleDTO> getFollowingPostsList(String token, String sort, Long categoryId){
         MemberEntity follower = memberService.getUserFromToken(token);
-
-        List<MemberEntity> followingMembers = followRepository.findByFollower_id(follower.getUser_id());
+/*
+        List<MemberEntity> followingMembers = followRepository.findByFollower(follower.getUserId());
         if(followingMembers.isEmpty()){
             throw new RuntimeException("팔로잉 하는 유저가 존재하지 않습니다.");
         }
+
+ */
+        // `follower.getUserId()`로 호출
+        List<Follow> followingRelationships = followRepository.findByFollower_UserId(follower.getUserId());
+        if (followingRelationships.isEmpty()) {
+            throw new RuntimeException("팔로잉 하는 유저가 존재하지 않습니다.");
+        }
+
+
+        // 팔로잉 유저 추출
+        List<MemberEntity> followingMembers = followingRelationships.stream()
+                .map(Follow::getFollowing)
+                .collect(Collectors.toList());
 
         List<Post> followingPostsList = followingMembers.stream()
                 .flatMap(member -> {
@@ -195,7 +208,6 @@ public class PostService {
         return postListToSimpleDTO(certPostsList);
     }
 
- */
 
     // 마이페이지 글 조회
     public List<MyPostDTO> getMyposts(Long id){
