@@ -181,6 +181,7 @@ public class AuthController {
     @PostMapping("/badge")
     public ResponseEntity<?> addBadge(@RequestHeader("Authorization") String token) {
         MemberResponseDTO memberResponseDTO = memberService.addBadge(token);
+        return ResponseEntity.status(HttpStatus.OK).body(memberResponseDTO);
     }
 
     @PostMapping("/logout")
