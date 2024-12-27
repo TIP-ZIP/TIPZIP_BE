@@ -151,36 +151,28 @@ public class PostService {
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public List<PostSimpleDTO> getFollowingPostsList(String token, String sort, Long categoryId){
         MemberEntity follower = memberService.getUserFromToken(token);
-/*
-        List<MemberEntity> followingMembers = followRepository.findByFollower(follower.getUserId());
-        if(followingMembers.isEmpty()){
-            throw new RuntimeException("팔로잉 하는 유저가 존재하지 않습니다.");
-        }
 
- */
-        // `follower.getUserId()`로 호출
+        // 내가 follower인 follow 관계들 - `follower.getUserId()`로 호출
         List<Follow> followingRelationships = followRepository.findByFollower_UserId(follower.getUserId());
         if (followingRelationships.isEmpty()) {
             throw new RuntimeException("팔로잉 하는 유저가 존재하지 않습니다.");
         }
-
 
         // 팔로잉 유저 추출
         List<MemberEntity> followingMembers = followingRelationships.stream()
                 .map(Follow::getFollowing)
                 .collect(Collectors.toList());
 
-        List<Post> followingPostsList = followingMembers.stream()
-                .flatMap(member -> {
-                    if (categoryId != null) {
-                        Category category = categoryRepository.findById(categoryId)
-                                .orElseThrow(() -> new RuntimeException("존재하지 않는 category ID 입니다."));
-                        return postRepository.findByCategoryAndMemberEntity(category, member).stream();
-                    } else {
-                        return postRepository.findByMemberEntity(member).stream();
-                    }
-                })
-                .collect(Collectors.toList());
+        // 팔로잉 유저들의 post들 list
+        List<Post> followingPostsList;
+
+        if (categoryId != null) {
+            Category category = categoryRepository.findById(categoryId)
+                    .orElseThrow(() -> new RuntimeException("존재하지 않는 category ID 입니다."));
+            followingPostsList = postRepository.findByCategoryAndMemberEntityIn(category, followingMembers);
+        } else {
+            followingPostsList = postRepository.findByMemberEntityIn(followingMembers);
+        }
 
         if(followingPostsList.isEmpty()){ throw new RuntimeException("팔로잉 user post가 존재하지 않습니다."); }
 
