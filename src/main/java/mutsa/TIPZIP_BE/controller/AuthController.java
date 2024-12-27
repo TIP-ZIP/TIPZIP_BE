@@ -1,6 +1,7 @@
 package mutsa.TIPZIP_BE.controller;
 
 import mutsa.TIPZIP_BE.dto.MemberDTO;
+import mutsa.TIPZIP_BE.dto.MemberResponseDTO;
 import mutsa.TIPZIP_BE.entity.MemberEntity;
 import mutsa.TIPZIP_BE.entity.RefreshToken;
 import mutsa.TIPZIP_BE.jwt.JwtTokenProvider;
@@ -176,6 +177,12 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류가 발생했습니다.");
         }
     }
+
+    @PostMapping("/badge")
+    public ResponseEntity<?> addBadge(@RequestHeader("Authorization") String token) {
+        MemberResponseDTO memberResponseDTO = memberService.addBadge(token);
+    }
+
     @PostMapping("/logout")
     public ResponseEntity<?> logout(@RequestHeader("Authorization") String token) {
         try{

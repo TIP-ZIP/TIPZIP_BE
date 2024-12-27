@@ -6,6 +6,7 @@ import com.nimbusds.jose.shaded.gson.JsonParser;
 import lombok.RequiredArgsConstructor;
 import mutsa.TIPZIP_BE.S3Storage.S3Service;
 import mutsa.TIPZIP_BE.dto.MemberDTO;
+import mutsa.TIPZIP_BE.dto.MemberResponseDTO;
 import mutsa.TIPZIP_BE.entity.MemberEntity;
 import mutsa.TIPZIP_BE.entity.OAuthProvider;
 import mutsa.TIPZIP_BE.jwt.JwtTokenProvider;
@@ -254,5 +255,10 @@ public class MemberService {
 //        System.out.println("Service 반환 전 MemberDTO: " + memberDTO); // 디버깅
         //memberentity 반환
         return memberEntity;
+    }
+
+    // 인증 유저로 전환 (배지 추가)
+    public MemberResponseDTO addBadge(String token) {
+
     }
 }
