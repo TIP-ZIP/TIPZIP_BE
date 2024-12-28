@@ -154,7 +154,8 @@ public class PostService {
         // 내가 follower인 follow 관계들 - `follower.getUserId()`로 호출
         List<Follow> followingRelationships = followRepository.findByFollower_UserId(follower.getUserId());
         if (followingRelationships.isEmpty()) {
-            throw new RuntimeException("팔로잉 하는 유저가 존재하지 않습니다.");
+            // throw new RuntimeException("팔로잉 하는 유저가 존재하지 않습니다.");
+            return Collections.emptyList();
         }
 
         // 팔로잉 유저 추출
