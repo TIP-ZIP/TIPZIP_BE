@@ -7,6 +7,7 @@ import mutsa.TIPZIP_BE.repository.PostRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -15,7 +16,7 @@ import java.util.stream.Collectors;
 public class SearchService {
     private final PostRepository postRepository;
     @Transactional
-    public List<PostResponseDTO> searchPosts(String searchKeyword,List<String> tags){
+    public List<PostResponseDTO> searchPosts(String searchKeyword,List<String> tags,String sort){
         System.out.println("searchKeyword: " + searchKeyword);
         System.out.println("tags: " + (tags == null ? "null" : tags));
         if((searchKeyword==null || searchKeyword.isEmpty()) && (tags == null || tags.isEmpty())){
@@ -35,8 +36,25 @@ public class SearchService {
             // 검색어만 있는 경우
             posts = postRepository.findByTitleContainingOrContentContaining(searchKeyword, searchKeyword);
         }
+        //정렬 기준에 따라 리스트 정렬
+        Comparator<Post> comparator=getComparator(sort);
+        posts.sort(comparator);
         return posts.stream()
                 .map(PostResponseDTO::new)
                 .collect(Collectors.toList());
+    }
+    private Comparator<Post> getComparator(String sort){
+        if ("recent".equalsIgnoreCase(sort) || sort == null || sort.isEmpty()) {
+            // 최신순 (createdAt 기준 내림차순)
+            return Comparator.comparing(Post::getCreatedAt).reversed();
+        } else if ("oldest".equalsIgnoreCase(sort)) {
+            // 오래된 순 (createdAt 기준 오름차순)
+            return Comparator.comparing(Post::getCreatedAt);
+        } else if ("popular".equalsIgnoreCase(sort)) {
+            // 스크랩 많은 순 (scrapCount 기준 내림차순)
+            return Comparator.comparing(Post::getScrapCount).reversed();
+        }
+        // 기본값 (최신순)
+        return Comparator.comparing(Post::getCreatedAt).reversed();
     }
 }
