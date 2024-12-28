@@ -23,7 +23,8 @@ public class SearchController {
     @GetMapping
     public ResponseEntity<?> searchPosts(
             @RequestParam(value = "search", required = false) String searchKeyword,
-            @RequestParam(value = "tags",required = false) String tags) {
+            @RequestParam(value = "tags",required = false) String tags,
+            @RequestParam(defaultValue = "recent") String sort) {
         List<String> tagList = (tags != null && !tags.isEmpty())
                 ? Arrays.asList(tags.split(","))
                 : null;
@@ -32,7 +33,7 @@ public class SearchController {
             // Request Body에서 태그 리스트 추출
             //List<String> tags = (body != null) ? body.get("tags") : null;
             //List<PostResponseDTO> results=searchService.searchPosts(searchKeyword,tags);
-            List<PostResponseDTO> results = searchService.searchPosts(searchKeyword, tagList);
+            List<PostResponseDTO> results = searchService.searchPosts(searchKeyword, tagList,sort);
             return ResponseEntity.ok(results);
         }catch (IllegalArgumentException e){
             return ResponseEntity.badRequest().body(e.getMessage());
