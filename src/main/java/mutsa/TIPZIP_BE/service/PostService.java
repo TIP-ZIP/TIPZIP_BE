@@ -16,10 +16,7 @@ import org.hibernate.query.Order;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j // 로거
@@ -157,7 +154,8 @@ public class PostService {
         // 내가 follower인 follow 관계들 - `follower.getUserId()`로 호출
         List<Follow> followingRelationships = followRepository.findByFollower_UserId(follower.getUserId());
         if (followingRelationships.isEmpty()) {
-            throw new RuntimeException("팔로잉 하는 유저가 존재하지 않습니다.");
+            // throw new RuntimeException("팔로잉 하는 유저가 존재하지 않습니다.");
+            return Collections.emptyList();
         }
 
         // 팔로잉 유저 추출
@@ -178,7 +176,7 @@ public class PostService {
             followingPostsList = postRepository.findByMemberEntityIn(followingMembers);
         }
 
-        if(followingPostsList.isEmpty()){ throw new RuntimeException("팔로잉 user post가 존재하지 않습니다."); }
+        if(followingPostsList.isEmpty()){ return Collections.emptyList(); }
 
         followingPostsList.sort(getComparator(sort));
 
