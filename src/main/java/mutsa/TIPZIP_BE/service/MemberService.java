@@ -80,6 +80,9 @@ public class MemberService {
                 save(memberDTO); //// DTO를 저장하는 메서드 호출
             }else{
                 System.out.println("이미 존재하는 회원입니다.:"+existingMember.getSocial_id());
+                System.out.println("기존 회원의 username: " + existingMember.getUsername());
+                memberDTO.setBadge(existingMember.getBadge());
+                memberDTO.setUsername(existingMember.getUsername());
             }
         }else {
             System.out.println("카카오에서 사용자 정보를 가져오지 못했습니다.");
@@ -141,6 +144,9 @@ public class MemberService {
                 save(memberDTO); //// DTO를 저장하는 메서드 호출
             }else{
                 System.out.println("이미 존재하는 회원입니다.:"+existingMember.getSocial_id());
+                System.out.println("기존 회원의 username: " + existingMember.getUsername());
+                memberDTO.setBadge(existingMember.getBadge());
+                memberDTO.setUsername(existingMember.getUsername());
             }
         }else {
             System.out.println("구글에서 사용자 정보를 가져오지 못했습니다.");
@@ -212,6 +218,9 @@ public class MemberService {
                 save(memberDTO); //// DTO를 저장하는 메서드 호출
             }else{
                 System.out.println("이미 존재하는 회원입니다.:"+existingMember.getSocial_id());
+                System.out.println("기존 회원의 username: " + existingMember.getUsername());
+                memberDTO.setBadge(existingMember.getBadge());
+                memberDTO.setUsername(existingMember.getUsername());
             }
         }else {
             System.out.println("네이버에서 사용자 정보를 가져오지 못했습니다.");
