@@ -16,16 +16,16 @@ import java.util.Optional;
 public interface PostRepository extends JpaRepository<Post, Long> {
 
     List<Post> findAll(Sort sort);
-    List<Post> findByCategory(Category category, Sort sort);
+
     List<Post> findByCategoryIn(List<Category> categories, Sort sort);
 
-    // 유저별 post들 반환
+    // 유저별 post들 반환 (마이페이지 post 조회)
     List<Post> findByMemberEntity(MemberEntity user);
-    List<Post> findByCategoryInAndMemberEntity(List<Category> categories, MemberEntity user);
     
     // 팔로잉 유저들 post들 반환에 사용
     List<Post> findByCategoryInAndMemberEntityIn(List<Category> categories, List<MemberEntity> members);
     List<Post> findByMemberEntityIn(List<MemberEntity> members);
+
 
     // 제목 또는 내용에 검색어가 포함된 post데이터 반환(태그 없고 검색어만 존재시 사용)
     List<Post> findByTitleContainingOrContentContaining(String title, String content);
