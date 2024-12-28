@@ -178,8 +178,8 @@ public class PostService {
             followingPostsList = postRepository.findByMemberEntityIn(followingMembers);
         }
 
-        // null인 경우 예외처리를 controller에서 진행
-//        followingPostsList.isEmpty()
+        if(followingPostsList.isEmpty()){ throw new RuntimeException("팔로잉 user post가 존재하지 않습니다."); }
+
         followingPostsList.sort(getComparator(sort));
 
         return postListToSimpleDTO(followingPostsList);
