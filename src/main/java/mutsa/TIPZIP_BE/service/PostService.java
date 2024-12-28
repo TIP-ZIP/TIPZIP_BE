@@ -133,14 +133,16 @@ public class PostService {
 
     // 전체 글 조회
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
-    public List<PostSimpleDTO> getPostList(String sort, Long categoryId){
+    public List<PostSimpleDTO> getPostList(String sort, List<Long> categoryIds){
+
         List<Post> postList;
 
-        if (categoryId != null) {
-            Category category = categoryRepository.findById(categoryId)
-                    .orElseThrow(() -> new RuntimeException("존재하지 않는 category ID 입니다."));
-
-            postList = postRepository.findByCategory(category, getSort(sort));
+        if (categoryIds != null && !categoryIds.isEmpty()) {
+            List<Category> categories = categoryRepository.findAllById(categoryIds);
+            if (categories.isEmpty()) {
+                throw new RuntimeException("존재하지 않는 category ID 입니다.");
+            }
+            postList = postRepository.findByCategoryIn(categories, getSort(sort));
         }
         else { postList = postRepository.findAll(getSort(sort)); }
 
@@ -149,7 +151,7 @@ public class PostService {
 
     // 팔로잉 유저 글 조회
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
-    public List<PostSimpleDTO> getFollowingPostsList(String token, String sort, Long categoryId){
+    public List<PostSimpleDTO> getFollowingPostsList(String token, String sort, List<Long> categoryIds){
         MemberEntity follower = memberService.getUserFromToken(token);
 
         // 내가 follower인 follow 관계들 - `follower.getUserId()`로 호출
@@ -166,10 +168,12 @@ public class PostService {
         // 팔로잉 유저들의 post들 list
         List<Post> followingPostsList;
 
-        if (categoryId != null) {
-            Category category = categoryRepository.findById(categoryId)
-                    .orElseThrow(() -> new RuntimeException("존재하지 않는 category ID 입니다."));
-            followingPostsList = postRepository.findByCategoryAndMemberEntityIn(category, followingMembers);
+        if (categoryIds != null && !categoryIds.isEmpty()) {
+            List<Category> categories = categoryRepository.findAllById(categoryIds);
+            if (categories.isEmpty()) {
+                throw new RuntimeException("존재하지 않는 category ID 입니다.");
+            }
+            followingPostsList = postRepository.findByCategoryInAndMemberEntityIn(categories, followingMembers);
         } else {
             followingPostsList = postRepository.findByMemberEntityIn(followingMembers);
         }
@@ -183,23 +187,40 @@ public class PostService {
 
     // 인증 유저 글 조회
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
-    public List<PostSimpleDTO> getCertPostsList(String sort, Long categoryId){
+    public List<PostSimpleDTO> getCertPostsList(String sort, List<Long> categoryIds){
         List<MemberEntity> certMembers = memberRepository.findByBadgeTrue();
         if(certMembers.isEmpty()){
             throw new RuntimeException("인증 user가 존재하지 않습니다.");
         }
 
+        /* 
+        // 멤버별 조회 방식
         List<Post> certPostsList = certMembers.stream()
                 .flatMap(member -> {
-                    if (categoryId != null) {
-                        Category category = categoryRepository.findById(categoryId)
-                                .orElseThrow(() -> new RuntimeException("존재하지 않는 category ID 입니다."));
-                        return postRepository.findByCategoryAndMemberEntity(category, member).stream();
+                    if (categoryIds != null && !categoryIds.isEmpty()) {
+                        List<Category> categories = categoryRepository.findAllById(categoryIds);
+                        if (categories.isEmpty()) {
+                            throw new RuntimeException("존재하지 않는 category ID 입니다.");
+                        }
+                        return postRepository.findByCategoryInAndMemberEntity(categories, member).stream();
                     } else {
                         return postRepository.findByMemberEntity(member).stream();
                     }
                 })
                 .collect(Collectors.toList());
+         */
+
+        List<Post> certPostsList;
+
+        if (categoryIds != null && !categoryIds.isEmpty()) {
+            List<Category> categories = categoryRepository.findAllById(categoryIds);
+            if (categories.isEmpty()) {
+                throw new RuntimeException("존재하지 않는 category ID 입니다.");
+            }
+            certPostsList = postRepository.findByCategoryInAndMemberEntityIn(categories, certMembers);
+        } else {
+            certPostsList = postRepository.findByMemberEntityIn(certMembers);
+        }
 
         if(certPostsList.isEmpty()){ throw new RuntimeException("인증 user post가 존재하지 않습니다."); }
 

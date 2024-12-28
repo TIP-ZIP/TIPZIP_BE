@@ -32,21 +32,28 @@ public class PostController {
 
     // GET
     @GetMapping
-    public ResponseEntity<?> getPostsList(@RequestParam(defaultValue = "recent") String sort, @RequestParam(required = false) Long category) {
+    public ResponseEntity<?> getPostsList(
+            @RequestParam(defaultValue = "recent") String sort,
+            @RequestParam(required = false) List<Long> category) {
         List<PostSimpleDTO> postSimpleDTOSs= postService.getPostList(sort, category);
         return ResponseEntity.status(HttpStatus.OK).body(postSimpleDTOSs);
     }
 
     // 팔로잉 유저
     @GetMapping("/following")
-    public ResponseEntity<?> getFollowingPostsList(@RequestHeader(value = "Authorization") String token, @RequestParam(defaultValue = "recent") String sort, @RequestParam(required = false) Long category) {
+    public ResponseEntity<?> getFollowingPostsList(
+            @RequestHeader(value = "Authorization") String token,
+            @RequestParam(defaultValue = "recent") String sort,
+            @RequestParam(required = false) List<Long> category) {
         List<PostSimpleDTO> postSimpleDTOSs= postService.getFollowingPostsList(token, sort, category);
         return ResponseEntity.status(HttpStatus.OK).body(postSimpleDTOSs);
     }
 
     // 인증된 유저
     @GetMapping("/cert")
-    public ResponseEntity<?> getCertPostsList(@RequestParam(defaultValue = "recent") String sort, @RequestParam(required = false) Long category) {
+    public ResponseEntity<?> getCertPostsList(
+            @RequestParam(defaultValue = "recent") String sort,
+            @RequestParam(required = false) List<Long> category) {
         List<PostSimpleDTO> postSimpleDTOSs= postService.getCertPostsList(sort, category);
         return ResponseEntity.status(HttpStatus.OK).body(postSimpleDTOSs);
     }
