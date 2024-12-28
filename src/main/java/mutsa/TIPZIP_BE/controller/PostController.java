@@ -46,6 +46,11 @@ public class PostController {
             @RequestParam(defaultValue = "recent") String sort,
             @RequestParam(required = false) List<Long> category) {
         List<PostSimpleDTO> postSimpleDTOSs= postService.getFollowingPostsList(token, sort, category);
+
+        if (postSimpleDTOSs.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
+        }
+
         return ResponseEntity.status(HttpStatus.OK).body(postSimpleDTOSs);
     }
 

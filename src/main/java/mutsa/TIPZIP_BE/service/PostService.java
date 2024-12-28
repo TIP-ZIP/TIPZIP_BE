@@ -16,10 +16,7 @@ import org.hibernate.query.Order;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j // 로거
@@ -178,7 +175,7 @@ public class PostService {
             followingPostsList = postRepository.findByMemberEntityIn(followingMembers);
         }
 
-        if(followingPostsList.isEmpty()){ throw new RuntimeException("팔로잉 user post가 존재하지 않습니다."); }
+        if(followingPostsList.isEmpty()){ return Collections.emptyList(); }
 
         followingPostsList.sort(getComparator(sort));
 
