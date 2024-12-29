@@ -229,11 +229,25 @@ public class PostService {
 
 
     // 마이페이지 글 조회
-    public List<MyPostDTO> getMyposts(Long id){
+    public List<MyPostDTO> getUserposts(Long id){
         MemberEntity memberEntity = memberRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 user 입니다."));
 
         List<Post> myPostsList = postRepository.findByMemberEntity(memberEntity);
+
+        if(myPostsList.isEmpty()){ return Collections.emptyList(); }
+
+        return myPostsList.stream()
+                .map(MyPostDTO::new)
+                .collect(Collectors.toList());
+    }
+
+    public List<MyPostDTO> getMyposts(String token){
+        MemberEntity member = memberService.getUserFromToken(token);
+
+        List<Post> myPostsList = postRepository.findByMemberEntity(member);
+
+        if(myPostsList.isEmpty()){ return Collections.emptyList(); }
 
         return myPostsList.stream()
                 .map(MyPostDTO::new)

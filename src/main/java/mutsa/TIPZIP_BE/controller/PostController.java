@@ -47,10 +47,7 @@ public class PostController {
             @RequestParam(required = false) List<Long> category) {
         List<PostSimpleDTO> postSimpleDTOSs= postService.getFollowingPostsList(token, sort, category);
 
-        if (postSimpleDTOSs.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null);
-        }
-
+        if (postSimpleDTOSs.isEmpty()) { return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null); }
         return ResponseEntity.status(HttpStatus.OK).body(postSimpleDTOSs);
     }
 
@@ -64,7 +61,6 @@ public class PostController {
     }
 
 
-
     @GetMapping("/{id}")
     public ResponseEntity<?> getOnePost(@PathVariable Long id) {
         PostResponseDTO postResponseDTO = postService.getOnePostDTO(id);
@@ -73,10 +69,21 @@ public class PostController {
     }
 
     @GetMapping("/user/{id}")
-    public ResponseEntity<?> getMyPosts(@PathVariable Long id) {
-        List<MyPostDTO> myPostDTOS = postService.getMyposts(id);
+    public ResponseEntity<?> getUserposts(@PathVariable Long id) {
+        List<MyPostDTO> myPostDTOS = postService.getUserposts(id);
+
+        if (myPostDTOS.isEmpty()) { return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null); }
         return ResponseEntity.status(200).body(myPostDTOS);
     }
+
+    @GetMapping("/my")
+    public ResponseEntity<?> getMyPosts(@RequestHeader(value = "Authorization") String token) {
+        List<MyPostDTO> myPostDTOS = postService.getMyposts(token);
+
+        if (myPostDTOS.isEmpty()) { return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null); }
+        return ResponseEntity.status(200).body(myPostDTOS);
+    }
+
 
     // PUT
     @PutMapping("/{id}")
