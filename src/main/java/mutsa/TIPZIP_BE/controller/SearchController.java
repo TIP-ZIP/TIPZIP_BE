@@ -2,6 +2,7 @@ package mutsa.TIPZIP_BE.controller;
 
 import lombok.RequiredArgsConstructor;
 import mutsa.TIPZIP_BE.dto.PostDTO.PostResponseDTO;
+import mutsa.TIPZIP_BE.dto.PostDTO.PostSearchResponseDTO;
 import mutsa.TIPZIP_BE.service.SearchService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +20,6 @@ public class SearchController {
     private final SearchService searchService;
     @GetMapping
     public ResponseEntity<?> searchPosts(
-            @RequestHeader(value = "Authorization") String token,
             @RequestParam(value = "search", required = false) String searchKeyword,
             @RequestParam(value = "tags",required = false) String tags,
             @RequestParam(defaultValue = "recent") String sort) {
@@ -31,7 +31,8 @@ public class SearchController {
             // Request Body에서 태그 리스트 추출
             //List<String> tags = (body != null) ? body.get("tags") : null;
             //List<PostResponseDTO> results=searchService.searchPosts(searchKeyword,tags);
-            List<PostResponseDTO> results = searchService.searchPosts(token, searchKeyword, tagList,sort);
+            List<PostSearchResponseDTO> results = searchService.searchPosts(searchKeyword, tagList,sort);
+            //List<PostResponseDTO> results = searchService.searchPosts(token, searchKeyword, tagList,sort);
             return ResponseEntity.ok(results);
         }catch (IllegalArgumentException e){
             return ResponseEntity.badRequest().body(e.getMessage());
