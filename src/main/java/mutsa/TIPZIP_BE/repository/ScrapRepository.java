@@ -13,6 +13,7 @@ import java.util.Optional;
 public interface ScrapRepository extends JpaRepository<Scrap, Long> {
     Long countByFolder(Folder folder);
     Long countByCategoryId(long categoryId);
+    long countByCategoryIdAndMemberEntity(Long categoryId, MemberEntity member);
 
     Optional<Scrap> findByPostAndMemberEntity(Post post, MemberEntity member);
 //    void deleteById(ScrapId scrapId);

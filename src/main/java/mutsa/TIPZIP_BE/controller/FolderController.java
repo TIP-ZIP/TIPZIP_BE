@@ -31,8 +31,8 @@ public class FolderController {
 
     // GET
     @GetMapping
-    public ResponseEntity<?> getPostsList(@RequestParam(defaultValue = "false") boolean is_my) {
-        List<FolderCountResponseDTO> folderCountResponseDTOS = folderService.getFolderList(is_my);
+    public ResponseEntity<?> getPostsList(@RequestHeader(value = "Authorization") String token, @RequestParam(defaultValue = "false") boolean is_my) {
+        List<FolderCountResponseDTO> folderCountResponseDTOS = folderService.getFolderList(is_my, token);
         return ResponseEntity.status(HttpStatus.OK).body(folderCountResponseDTOS);
     }
 

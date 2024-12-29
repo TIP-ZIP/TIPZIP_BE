@@ -49,13 +49,15 @@ public class FolderService {
         return new FolderResponseDTO(folder);
     }
 
-    public List<FolderCountResponseDTO> getFolderList(boolean is_my) {
+    public List<FolderCountResponseDTO> getFolderList(boolean is_my, String token) {
+
+        MemberEntity member = memberService.getUserFromToken(token);
 
         List<FolderCountResponseDTO> folderCountResponseDTOList = new ArrayList<>();
 
         if (is_my) {
             // 나만의 폴더 스크랩 수 조회
-            List<Folder> folderList = folderRepository.findAll();
+            List<Folder> folderList = folderRepository.findByMemberEntity(member);
             for (Folder folder : folderList) {
                 long count = scrapRepository.countByFolder(folder);
                 folderCountResponseDTOList.add(new FolderCountResponseDTO(folder, count));
@@ -66,7 +68,7 @@ public class FolderService {
             for (String categoryName : categoryList) {
                 Category category = categoryRepository.findByCategoryName(categoryName)
                         .orElseThrow(() -> new RuntimeException("존재하지 않는 category 입니다."));
-                long count = scrapRepository.countByCategoryId(category.getId());
+                long count = scrapRepository.countByCategoryIdAndMemberEntity(category.getId(), member);
                 folderCountResponseDTOList.add(new FolderCountResponseDTO(categoryName, count));
             }
         }
