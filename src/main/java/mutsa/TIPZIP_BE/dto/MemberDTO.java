@@ -22,11 +22,10 @@ public class MemberDTO {
     private String username; // 사용자명
     private String profile_image;
     private Boolean badge=false;
-    private OAuthProvider oAuthProvider; // 소셜 로그인 제공자 정보 (필요 시)
-    // 카카오 응답의 "name" 필드를 "social_id"에 매핑
-    @JsonProperty("nickname") //but, google,naver 도입 시 수정 필요.
-    private String social_id;
+    private OAuthProvider oAuthProvider;
 
+    @JsonProperty("nickname")
+    private String social_id;
 
     private String email;
     private String message;
@@ -38,7 +37,6 @@ public class MemberDTO {
     private String accessToken;
     private String refreshToken;
 
-    //lombok 어노테이션으로 getter,setter,생성자 ,tostring 메서드 생략 가능
     //소셜 회원용 메서드
     public static MemberDTO socialMemberDTO(MemberEntity memberEntity){
         if (memberEntity == null) {
