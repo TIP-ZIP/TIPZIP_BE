@@ -148,6 +148,22 @@ public class AuthController {
         response.put("access_token", newAccessToken);
         return ResponseEntity.ok(response);
     }
+    @PostMapping("/validate-token")
+    public ResponseEntity<?> validateToken(@RequestHeader("Authorization") String token) {
+        try {
+            // Bearer 부분 제거
+            String jwtToken = token.replace("Bearer ", "");
+
+            // 토큰 유효성 검증
+            if (jwtTokenProvider.validateToken(jwtToken)) {
+                return ResponseEntity.ok("토큰이 유효합니다.");
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("유효하지 않은 토큰입니다.");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("토큰 검증 중 오류가 발생했습니다.");
+        }
+    }
     @PostMapping("/username")
     public ResponseEntity<?> username(@RequestBody Map<String, String> request,@RequestHeader("Authorization") String token) {
         try {

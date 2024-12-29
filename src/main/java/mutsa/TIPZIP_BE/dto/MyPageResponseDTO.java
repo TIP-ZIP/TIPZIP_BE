@@ -18,6 +18,8 @@ public class MyPageResponseDTO {
     private int followerCount;
     private String message;
     private boolean badge;
+    private String social_provider; // 소셜 로그인 제공자
+    private String email;
 
     public static MyPageResponseDTO fromMemberEntity(MemberEntity memberEntity, int followerCount, int followingCount) {
         MyPageResponseDTO myPageResponseDTO = new MyPageResponseDTO();
@@ -28,6 +30,8 @@ public class MyPageResponseDTO {
         //myPageResponseDTO.setPostCount(postCount);
         myPageResponseDTO.setFollowerCount(followerCount);
         myPageResponseDTO.setFollowingCount(followingCount);
+        myPageResponseDTO.setSocial_provider(memberEntity.getSocial_provider().toString()); // 소셜 제공자 설정
+        myPageResponseDTO.setEmail(memberEntity.getEmail()); // 이메일 설정
         return myPageResponseDTO;
     }
 
