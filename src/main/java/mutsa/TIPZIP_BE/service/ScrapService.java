@@ -41,7 +41,7 @@ public class ScrapService {
         if (scrapRequestsDTO.folder_name() != null && !scrapRequestsDTO.folder_name().isEmpty()) {
             folder = folderRepository.findByFolderNameAndMemberEntity(scrapRequestsDTO.folder_name(), member)
                     .orElseThrow(() -> new RuntimeException("존재하지 않는 Folder 입니다 : " + scrapRequestsDTO.folder_name()));
-        } log.info("Folder : ", folder);
+        } log.info("Folder : ", folder.getFolderName());
 
         Scrap scrap = Scrap.builder()
                 .categoryId(post.getCategory().getId())
