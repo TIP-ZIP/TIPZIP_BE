@@ -1,5 +1,6 @@
 package mutsa.TIPZIP_BE.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -47,10 +48,12 @@ public class MemberEntity {
 
     // 연관관계 매핑
     // folder 매핑
-    @OneToMany(mappedBy = "memberEntity")
+    @OneToMany(mappedBy = "memberEntity", fetch = FetchType.LAZY)
+    @JsonManagedReference
     private List<Folder> folders = new ArrayList<>();
     // scrap 매핑
-    @OneToMany(mappedBy = "memberEntity")
+    @OneToMany(mappedBy = "memberEntity", fetch = FetchType.LAZY)
+    @JsonManagedReference
     private List<Scrap> scraps = new ArrayList<>();
     // follow 매핑
     @OneToMany(mappedBy = "follower", cascade = CascadeType.ALL, orphanRemoval = true)

@@ -98,6 +98,8 @@ public class ScrapService {
         Scrap scrap = scrapRepository.findByPostAndMemberEntity(post, member)
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 Scrap 입니다 : " + scrapRequestsDTO.post_id()));
 
+        log.info("Delete scrap : " + scrap.getId());
+
         scrapRepository.delete(scrap);
         scrapRepository.flush();
 
