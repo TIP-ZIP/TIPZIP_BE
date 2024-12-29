@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -32,9 +33,9 @@ public class ScrapController {
         return ResponseEntity.status(201).body(scrapByCategoryDTOs);
     }
 
-    @GetMapping("/{folder}")
-    public ResponseEntity<?> getFolder(@PathVariable String folder, @RequestHeader(value = "Authorization") String token) {
-        List<MyPostDTO> scrapByCategoryDTOs = scrapService.getScrapByFolder(folder, token);
+    @GetMapping("/folder")
+    public ResponseEntity<?> getFolder(@RequestHeader(value = "Authorization") String token, @RequestBody Map<String, String> folderNameMap) {
+        List<MyPostDTO> scrapByCategoryDTOs = scrapService.getScrapByFolder(folderNameMap.get("folder_name"), token);
         return ResponseEntity.status(201).body(scrapByCategoryDTOs);
     }
 
