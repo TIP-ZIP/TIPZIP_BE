@@ -2,6 +2,7 @@ package mutsa.TIPZIP_BE.service;
 
 import lombok.RequiredArgsConstructor;
 import mutsa.TIPZIP_BE.dto.PostDTO.PostResponseDTO;
+import mutsa.TIPZIP_BE.dto.PostDTO.PostSearchResponseDTO;
 import mutsa.TIPZIP_BE.entity.MemberEntity;
 import mutsa.TIPZIP_BE.entity.Post;
 import mutsa.TIPZIP_BE.repository.MemberRepository;
@@ -22,8 +23,8 @@ public class SearchService {
     private final MemberService memberService;
 
     @Transactional
-    public List<PostResponseDTO> searchPosts(String token, String searchKeyword,List<String> tags,String sort){
-        MemberEntity member = memberService.getUserFromToken(token);
+    public List<PostSearchResponseDTO> searchPosts(String searchKeyword,List<String> tags,String sort){
+
 
         System.out.println("searchKeyword: " + searchKeyword);
         System.out.println("tags: " + (tags == null ? "null" : tags));
@@ -48,8 +49,11 @@ public class SearchService {
         Comparator<Post> comparator=getComparator(sort);
         posts.sort(comparator);
         return posts.stream()
-                .map(post -> new PostResponseDTO(post, scrapRepository.existsByPostAndMemberEntity(post, member)))
+                .map(PostSearchResponseDTO::fromPost) // 새로운 DTO 매핑
                 .collect(Collectors.toList());
+                //.map(PostResponseDTO::new)
+                //.map(post -> new PostResponseDTO(post, scrapRepository.existsByPostAndMemberEntity(post, member)))
+                //.collect(Collectors.toList());
     }
     private Comparator<Post> getComparator(String sort){
         if ("recent".equalsIgnoreCase(sort) || sort == null || sort.isEmpty()) {
