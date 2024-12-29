@@ -60,7 +60,7 @@ public class FolderService {
             List<Folder> folderList = folderRepository.findByMemberEntity(member);
             for (Folder folder : folderList) {
                 long count = scrapRepository.countByFolder(folder);
-                folderCountResponseDTOList.add(new FolderCountResponseDTO(folder, count));
+                folderCountResponseDTOList.add(new FolderCountResponseDTO(folder.getFolderName(), count, folder.getId()));
             }
         } else {
             // 카테고리별 폴더 스크랩 수 조회
@@ -69,7 +69,7 @@ public class FolderService {
                 Category category = categoryRepository.findByCategoryName(categoryName)
                         .orElseThrow(() -> new RuntimeException("존재하지 않는 category 입니다."));
                 long count = scrapRepository.countByCategoryIdAndMemberEntity(category.getId(), member);
-                folderCountResponseDTOList.add(new FolderCountResponseDTO(categoryName, count));
+                folderCountResponseDTOList.add(new FolderCountResponseDTO(categoryName, count, null));
             }
         }
         return folderCountResponseDTOList;
