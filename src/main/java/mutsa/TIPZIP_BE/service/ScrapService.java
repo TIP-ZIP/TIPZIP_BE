@@ -53,8 +53,8 @@ public class ScrapService {
         scrapRepository.save(scrap);
         log.info("Scrap is added.");
 
-        // post 에 scrap 관계 설정
-        post.addScrap(scrap);
+        // post 에 scrap count ++
+        post.addScrap();
 
         return new ScrapResponseDTO(scrap);
     }
@@ -68,7 +68,7 @@ public class ScrapService {
         List<Post> categoryPostsList = scrapRepository.findByCategoryIdAndMember(id, member);
 
         return categoryPostsList.stream()
-                .map(MyPostDTO::new)
+                .map(post -> new MyPostDTO(post, scrapRepository.existsByPostAndMemberEntity(post, member)))
                 .collect(Collectors.toList());
     }
 
@@ -81,7 +81,7 @@ public class ScrapService {
         List<Post> categoryPostsList = scrapRepository.findByFolderAndMember(folder, member);
 
         return categoryPostsList.stream()
-                .map(MyPostDTO::new)
+                .map(post -> new MyPostDTO(post, scrapRepository.existsByPostAndMemberEntity(post, member)))
                 .collect(Collectors.toList());
     }
 
@@ -96,8 +96,8 @@ public class ScrapService {
         Scrap scrap = scrapRepository.findByPostAndMemberEntity(post, member)
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 Scrap 입니다 : " + scrapRequestsDTO.post_id()));
 
-        // post 에 scrap 관계 해제
-        post.removeScrap(scrap);
+        // post 에 scrap count --
+        post.removeScrap();
         scrapRepository.delete(scrap);
     }
 }

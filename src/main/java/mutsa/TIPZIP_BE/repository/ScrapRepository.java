@@ -16,7 +16,7 @@ public interface ScrapRepository extends JpaRepository<Scrap, Long> {
     long countByCategoryIdAndMemberEntity(Long categoryId, MemberEntity member);
 
     Optional<Scrap> findByPostAndMemberEntity(Post post, MemberEntity member);
-//    void deleteById(ScrapId scrapId);
+    boolean existsByPostAndMemberEntity(Post post, MemberEntity member);
 
     @Query("SELECT s.post FROM Scrap s WHERE s.categoryId = :categoryId AND s.memberEntity = :member")
     List<Post> findByCategoryIdAndMember(@Param("categoryId") long categoryId, @Param("member") MemberEntity member);

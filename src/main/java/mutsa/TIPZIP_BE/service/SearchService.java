@@ -2,8 +2,11 @@ package mutsa.TIPZIP_BE.service;
 
 import lombok.RequiredArgsConstructor;
 import mutsa.TIPZIP_BE.dto.PostDTO.PostResponseDTO;
+import mutsa.TIPZIP_BE.entity.MemberEntity;
 import mutsa.TIPZIP_BE.entity.Post;
+import mutsa.TIPZIP_BE.repository.MemberRepository;
 import mutsa.TIPZIP_BE.repository.PostRepository;
+import mutsa.TIPZIP_BE.repository.ScrapRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,8 +18,13 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class SearchService {
     private final PostRepository postRepository;
+    private final ScrapRepository scrapRepository;
+    private final MemberService memberService;
+
     @Transactional
-    public List<PostResponseDTO> searchPosts(String searchKeyword,List<String> tags,String sort){
+    public List<PostResponseDTO> searchPosts(String token, String searchKeyword,List<String> tags,String sort){
+        MemberEntity member = memberService.getUserFromToken(token);
+
         System.out.println("searchKeyword: " + searchKeyword);
         System.out.println("tags: " + (tags == null ? "null" : tags));
         if((searchKeyword==null || searchKeyword.isEmpty()) && (tags == null || tags.isEmpty())){
@@ -40,7 +48,7 @@ public class SearchService {
         Comparator<Post> comparator=getComparator(sort);
         posts.sort(comparator);
         return posts.stream()
-                .map(PostResponseDTO::new)
+                .map(post -> new PostResponseDTO(post, scrapRepository.existsByPostAndMemberEntity(post, member)))
                 .collect(Collectors.toList());
     }
     private Comparator<Post> getComparator(String sort){
