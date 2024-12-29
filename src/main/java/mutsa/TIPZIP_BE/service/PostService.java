@@ -237,6 +237,7 @@ public class PostService {
 
 
     // 마이페이지 글 조회
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public List<MyPostDTO> getUserposts(String token, Long id){
         MemberEntity member = memberService.getUserFromToken(token);
 
@@ -252,6 +253,7 @@ public class PostService {
                 .collect(Collectors.toList());
     }
 
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public List<MyPostDTO> getMyposts(String token){
         MemberEntity member = memberService.getUserFromToken(token);
 
