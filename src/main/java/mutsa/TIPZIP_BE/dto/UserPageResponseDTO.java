@@ -18,7 +18,9 @@ public class UserPageResponseDTO {
     private int followerCount;
     private String message;
     private boolean badge;
-    private boolean following; // 추가된 필드
+    private boolean following;
+    private String social_provider; // 소셜 로그인 제공자
+    private String email;     // 추가된 필드
 
     public static UserPageResponseDTO fromMemberEntity(MemberEntity memberEntity, int followerCount, int followingCount,boolean following) {
         UserPageResponseDTO userPageResponseDTO = new UserPageResponseDTO();
@@ -29,6 +31,8 @@ public class UserPageResponseDTO {
         //myPageResponseDTO.setPostCount(postCount);
         userPageResponseDTO.setFollowerCount(followerCount);
         userPageResponseDTO.setFollowingCount(followingCount);
+        userPageResponseDTO.setSocial_provider(memberEntity.getSocial_provider().toString()); // 소셜 제공자 설정
+        userPageResponseDTO.setEmail(memberEntity.getEmail()); // 이메일 설정
         userPageResponseDTO.setFollowing(following);
         return userPageResponseDTO;
     }
