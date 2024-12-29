@@ -139,7 +139,7 @@ public class AuthController {
 
         // 데이터베이스에 저장된 리프레시 토큰 확인
         RefreshToken refreshToken = refreshTokenService.getRefreshToken(email);
-        if (jwtTokenProvider.validateToken(refreshToken.getToken())) {
+        if (!(jwtTokenProvider.validateToken(refreshToken.getToken()))) {
             return ResponseEntity.status(403).body("리프레시 토큰이 유효하지 않습니다.");
         }
         // 새로운 액세스 토큰 생성
