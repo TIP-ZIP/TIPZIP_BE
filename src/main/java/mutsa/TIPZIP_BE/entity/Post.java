@@ -37,7 +37,7 @@ public class Post {
     private Category category;
 
     // tag 매핑
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "post")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "post", cascade = CascadeType.REMOVE)
     private List<post_tag> postTags = new ArrayList<>();
     // scrap 매핑
     @OneToOne(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = true)
