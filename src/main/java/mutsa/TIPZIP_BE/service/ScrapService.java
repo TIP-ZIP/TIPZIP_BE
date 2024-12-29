@@ -74,10 +74,10 @@ public class ScrapService {
     }
 
     public List<MyPostDTO> getScrapByFolder(String folderName, String token) {
-        Folder folder = folderRepository.findByFolderName(folderName)
-                .orElseThrow(() -> new RuntimeException("존재하지 않는 Folder 입니다 : " + folderName));
-
         MemberEntity member = memberService.getUserFromToken(token);
+
+        Folder folder = folderRepository.findByFolderNameAndMemberEntity(folderName, member)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 Folder 입니다 : " + folderName));
 
         List<Post> categoryPostsList = scrapRepository.findByFolderAndMember(folder, member);
 

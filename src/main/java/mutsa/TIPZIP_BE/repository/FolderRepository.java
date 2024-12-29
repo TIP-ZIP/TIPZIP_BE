@@ -13,5 +13,6 @@ import java.util.Optional;
 public interface FolderRepository extends JpaRepository<Folder, Long> {
 
     Optional<Folder> findByFolderName(String name);
+    Optional<Folder> findByFolderNameAndMemberEntity(String name, MemberEntity member);
     List<Folder> findByMemberEntity(MemberEntity memberEntity);
 }
