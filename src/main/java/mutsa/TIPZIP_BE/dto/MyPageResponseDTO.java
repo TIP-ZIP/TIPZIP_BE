@@ -28,7 +28,6 @@ public class MyPageResponseDTO {
         myPageResponseDTO.setUsername(memberEntity.getUsername());
         myPageResponseDTO.setMessage(memberEntity.getMessage());
         myPageResponseDTO.setBadge(memberEntity.getBadge());
-        //myPageResponseDTO.setPostCount(postCount);
         myPageResponseDTO.setFollowerCount(followerCount);
         myPageResponseDTO.setFollowingCount(followingCount);
         myPageResponseDTO.setSocial_provider(memberEntity.getSocial_provider().toString()); // 소셜 제공자 설정

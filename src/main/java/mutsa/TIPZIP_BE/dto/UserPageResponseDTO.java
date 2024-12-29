@@ -13,7 +13,6 @@ import mutsa.TIPZIP_BE.entity.MemberEntity;
 public class UserPageResponseDTO {
     private String profile_image;
     private String username;
-    //private int postCount;
     private int followingCount;
     private int followerCount;
     private String message;
@@ -29,7 +28,6 @@ public class UserPageResponseDTO {
         userPageResponseDTO.setUsername(memberEntity.getUsername());
         userPageResponseDTO.setMessage(memberEntity.getMessage());
         userPageResponseDTO.setBadge(memberEntity.getBadge());
-        //myPageResponseDTO.setPostCount(postCount);
         userPageResponseDTO.setFollowerCount(followerCount);
         userPageResponseDTO.setFollowingCount(followingCount);
         userPageResponseDTO.setSocial_provider(memberEntity.getSocial_provider().toString()); // 소셜 제공자 설정
