@@ -31,6 +31,7 @@ public class PostService {
     private final MemberRepository memberRepository;
     private final MemberService memberService;
     private final FollowRepository followRepository;
+    private final ScrapRepository scrapRepository;
 
     @Transactional
     public PostResponseDTO createPost(String token, PostRequestsDTO postRequestsDTO) {
@@ -57,7 +58,7 @@ public class PostService {
         // 태그 처리
         setTag(postRequestsDTO, post);
 
-        return new PostResponseDTO(post);
+        return new PostResponseDTO(post, false);
     }
 
     private void setTag(PostRequestsDTO postRequestsDTO, Post post) {
@@ -87,9 +88,10 @@ public class PostService {
     }
 
     // Post List -> SimpleDTO List 변환 method
-    private static List<PostSimpleDTO> postListToSimpleDTO(List<Post> postList) {
+    private static List<PostSimpleDTO> postListToSimpleDTO(List<Post> postList, MemberEntity member, ScrapRepository scrapRepository) {
+
         return postList.stream()
-                .map(PostSimpleDTO::new)
+                .map(post -> new PostSimpleDTO(post, scrapRepository.existsByPostAndMemberEntity(post, member)))
                 .collect(Collectors.toList());
     }
 
@@ -122,15 +124,19 @@ public class PostService {
 
     // 단일 글 조회
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
-    public PostResponseDTO getOnePostDTO(Long id) {
+    public PostResponseDTO getOnePostDTO(String token, Long id) {
+        MemberEntity member = memberService.getUserFromToken(token);
         Post post = getOnePost(id);
 
-        return new PostResponseDTO(post);
+        boolean isScrapped = scrapRepository.existsByPostAndMemberEntity(post, member);
+
+        return new PostResponseDTO(post, isScrapped);
     }
 
     // 전체 글 조회
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
-    public List<PostSimpleDTO> getPostList(String sort, List<Long> categoryIds){
+    public List<PostSimpleDTO> getPostList(String token, String sort, List<Long> categoryIds){
+        MemberEntity member = memberService.getUserFromToken(token);
 
         List<Post> postList;
 
@@ -143,7 +149,7 @@ public class PostService {
         }
         else { postList = postRepository.findAll(getSort(sort)); }
 
-        return postListToSimpleDTO(postList);
+        return postListToSimpleDTO(postList, member, scrapRepository);
     }
 
     // 팔로잉 유저 글 조회
@@ -180,12 +186,14 @@ public class PostService {
 
         followingPostsList.sort(getComparator(sort));
 
-        return postListToSimpleDTO(followingPostsList);
+        return postListToSimpleDTO(followingPostsList, follower, scrapRepository);
     }
 
     // 인증 유저 글 조회
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
-    public List<PostSimpleDTO> getCertPostsList(String sort, List<Long> categoryIds){
+    public List<PostSimpleDTO> getCertPostsList(String token, String sort, List<Long> categoryIds){
+        MemberEntity member = memberService.getUserFromToken(token);
+
         List<MemberEntity> certMembers = memberRepository.findByBadgeTrue();
         if(certMembers.isEmpty()){
             throw new RuntimeException("인증 user가 존재하지 않습니다.");
@@ -224,12 +232,14 @@ public class PostService {
 
         certPostsList.sort(getComparator(sort));
 
-        return postListToSimpleDTO(certPostsList);
+        return postListToSimpleDTO(certPostsList, member, scrapRepository);
     }
 
 
     // 마이페이지 글 조회
-    public List<MyPostDTO> getUserposts(Long id){
+    public List<MyPostDTO> getUserposts(String token, Long id){
+        MemberEntity member = memberService.getUserFromToken(token);
+
         MemberEntity memberEntity = memberRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 user 입니다."));
 
@@ -238,7 +248,7 @@ public class PostService {
         if(myPostsList.isEmpty()){ return Collections.emptyList(); }
 
         return myPostsList.stream()
-                .map(MyPostDTO::new)
+                .map(post -> new MyPostDTO(post, scrapRepository.existsByPostAndMemberEntity(post, member)))
                 .collect(Collectors.toList());
     }
 
@@ -250,7 +260,7 @@ public class PostService {
         if(myPostsList.isEmpty()){ return Collections.emptyList(); }
 
         return myPostsList.stream()
-                .map(MyPostDTO::new)
+                .map(post -> new MyPostDTO(post, scrapRepository.existsByPostAndMemberEntity(post, member)))
                 .collect(Collectors.toList());
     }
 
@@ -279,8 +289,9 @@ public class PostService {
         }
 
         log.info("Post Id : {} is changed.", id);
+        boolean isScrapped = scrapRepository.existsByPostAndMemberEntity(post, member);
         // 더티 체킹
-        return new PostResponseDTO(post);
+        return new PostResponseDTO(post, isScrapped);
     }
 
 

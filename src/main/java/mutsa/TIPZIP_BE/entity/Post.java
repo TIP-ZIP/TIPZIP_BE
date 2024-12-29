@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import mutsa.TIPZIP_BE.repository.ScrapRepository;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -52,20 +53,12 @@ public class Post {
     private String thumbnail_url;
     private long scrapCount; // 스크랩 수
 
-
-    // scrap 여부
-    public boolean isScrapped() {
-        return this.scrap != null;
-    }
-
     // scrap 추가
-    public void addScrap(Scrap scrap) {
-        this.scrap = scrap;
+    public void addScrap() {
         this.scrapCount++;
     }
     // scrap 삭제
-    public void removeScrap(Scrap scrap) {
-        this.scrap = null;
+    public void removeScrap() {
         this.scrapCount--;
     }
 

@@ -33,9 +33,10 @@ public class PostController {
     // GET
     @GetMapping
     public ResponseEntity<?> getPostsList(
+            @RequestHeader(value = "Authorization") String token,
             @RequestParam(defaultValue = "recent") String sort,
             @RequestParam(required = false) List<Long> category) {
-        List<PostSimpleDTO> postSimpleDTOSs= postService.getPostList(sort, category);
+        List<PostSimpleDTO> postSimpleDTOSs= postService.getPostList(token, sort, category);
         return ResponseEntity.status(HttpStatus.OK).body(postSimpleDTOSs);
     }
 
@@ -54,23 +55,24 @@ public class PostController {
     // 인증된 유저
     @GetMapping("/cert")
     public ResponseEntity<?> getCertPostsList(
+            @RequestHeader(value = "Authorization") String token,
             @RequestParam(defaultValue = "recent") String sort,
             @RequestParam(required = false) List<Long> category) {
-        List<PostSimpleDTO> postSimpleDTOSs= postService.getCertPostsList(sort, category);
+        List<PostSimpleDTO> postSimpleDTOSs= postService.getCertPostsList(token, sort, category);
         return ResponseEntity.status(HttpStatus.OK).body(postSimpleDTOSs);
     }
 
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getOnePost(@PathVariable Long id) {
-        PostResponseDTO postResponseDTO = postService.getOnePostDTO(id);
+    public ResponseEntity<?> getOnePost(@RequestHeader(value = "Authorization") String token, @PathVariable Long id) {
+        PostResponseDTO postResponseDTO = postService.getOnePostDTO(token, id);
 
         return ResponseEntity.status(200).body(postResponseDTO);
     }
 
     @GetMapping("/user/{id}")
-    public ResponseEntity<?> getUserposts(@PathVariable Long id) {
-        List<MyPostDTO> myPostDTOS = postService.getUserposts(id);
+    public ResponseEntity<?> getUserposts(@RequestHeader(value = "Authorization") String token, @PathVariable Long id) {
+        List<MyPostDTO> myPostDTOS = postService.getUserposts(token, id);
 
         if (myPostDTOS.isEmpty()) { return ResponseEntity.status(HttpStatus.NO_CONTENT).body(null); }
         return ResponseEntity.status(200).body(myPostDTOS);
