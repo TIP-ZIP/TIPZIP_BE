@@ -27,7 +27,6 @@ public class MyPageController {
     public ResponseEntity<?> view_mypage(@RequestHeader("Authorization") String token) {
         try {
             MyPageResponseDTO responseDTO = myPageService.getMyPage(token);
-            System.out.println("responseDTO hashCode in Controller: " + System.identityHashCode(responseDTO));
             System.out.println("Returned responseDTO: " + responseDTO);
             return ResponseEntity.ok(responseDTO);
         } catch (IllegalArgumentException e) {

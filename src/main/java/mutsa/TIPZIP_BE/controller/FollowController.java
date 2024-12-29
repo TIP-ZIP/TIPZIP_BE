@@ -30,10 +30,6 @@ public class FollowController {
                     .orElseThrow(() -> new IllegalArgumentException("팔로우를 요청한 유저를 찾을 수 없습니다."));
             MemberEntity following_memberEntity2 = memberRepository.findById(followingId)
                     .orElseThrow(() -> new IllegalArgumentException("팔로우 대상 유저를 찾을 수 없습니다."));
-            //MemberEntity follower= memberRepository.findById(memberService.getUserFromToken(token).getUser_id())
-            //       .orElseThrow(() -> new IllegalArgumentException("팔로우를 요청한 유저를 찾을 수 없습니다."));
-            //MemberEntity following=memberRepository.findById(followingId)
-            //        .orElseThrow(() -> new IllegalArgumentException("팔로우 대상 유저를 찾을 수 없습니다."));
             followService.follow(follower_memberEntity1,following_memberEntity2);
             return ResponseEntity.ok("팔로우 성공");
         }catch (IllegalArgumentException e){
@@ -70,12 +66,6 @@ public class FollowController {
                     .orElseThrow(() -> new IllegalArgumentException("팔로우를 요청한 유저를 찾을 수 없습니다."));
             MemberEntity following_memberEntity2 = memberRepository.findById(followingId)
                     .orElseThrow(() -> new IllegalArgumentException("팔로우 대상 유저를 찾을 수 없습니다."));
-            /*
-            MemberEntity follower= memberRepository.findById(memberService.getUserFromToken(token).getUser_id())
-                    .orElseThrow(() -> new IllegalArgumentException("팔로우 취소를 요청한 유저를 찾을 수 없습니다."));
-            MemberEntity following=memberRepository.findById(followingId)
-                    .orElseThrow(() -> new IllegalArgumentException("팔로우 취소대상 유저를 찾을 수 없습니다."));
-             */
             followService.unfollow(follower_memberEntity1, following_memberEntity2);
             return ResponseEntity.ok("팔로우 취소 성공");
         }catch (IllegalArgumentException e) {
