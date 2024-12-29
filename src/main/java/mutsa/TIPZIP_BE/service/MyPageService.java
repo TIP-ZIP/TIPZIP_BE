@@ -3,6 +3,7 @@ package mutsa.TIPZIP_BE.service;
 import lombok.RequiredArgsConstructor;
 import mutsa.TIPZIP_BE.S3Storage.S3Service;
 import mutsa.TIPZIP_BE.dto.MyPageResponseDTO;
+import mutsa.TIPZIP_BE.dto.UserPageResponseDTO;
 import mutsa.TIPZIP_BE.entity.MemberEntity;
 import mutsa.TIPZIP_BE.jwt.JwtTokenProvider;
 import mutsa.TIPZIP_BE.repository.FollowRepository;
@@ -25,11 +26,14 @@ public class MyPageService {
         String email=jwtTokenProvider.getEmailFromToken(token.replace("Bearer ", ""));
         MemberEntity memberEntity = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+        // 최신 데이터 확인
+        System.out.println("Message in DB: " + memberEntity.getMessage());
 
         //아래는 예시이며, post, follow관련 로직 구현 후 수정필요.
         //int postCount = postRepository.countByUserId(memberEntity.getUser_id()); // 게시글 수
         int followerCount = followRepository.countByFollowing(memberEntity); // 팔로워 수
         int followingCount = followRepository.countByFollower(memberEntity); // 팔로잉 수
+
 
         //MyPageResponseDTO myPageResponseDTO = MyPageResponseDTO.fromMemberEntity(memberEntity);
 
@@ -60,6 +64,8 @@ public class MyPageService {
 
         memberEntity.setMessage(newMessage);
         memberRepository.save(memberEntity);
+        // 디버깅용 출력
+        System.out.println("Updated Message: " + memberEntity.getMessage());
     }
     public String updateProfileImage(String token, MultipartFile file){
         String email=jwtTokenProvider.getEmailFromToken(token.replace("Bearer ", ""));
@@ -87,13 +93,19 @@ public class MyPageService {
         return newImageUrl;
 
     }
-    public MyPageResponseDTO getOtherUserPage(Long userId){
+    public UserPageResponseDTO getOtherUserPage(Long userId,String currentUserEmail){
         MemberEntity memberEntity=memberRepository.findById(userId)
                 .orElseThrow(()->new IllegalArgumentException("해당 유저를 찾을 수 없습니다."));
-        //아래는 예시이며, post, follow관련 로직 구현 후 수정필요.
-        //int postCount = postRepository.countByUserId(memberEntity.getUser_id()); // 게시글 수
+        // 현재 사용자 정보
+        MemberEntity currentUser = memberRepository.findByEmail(currentUserEmail)
+                .orElseThrow(() -> new IllegalArgumentException("현재 사용자를 찾을 수 없습니다."));
+
         int followerCount = followRepository.countByFollowing(memberEntity);  // 팔로워 수
         int followingCount = followRepository.countByFollower(memberEntity); // 팔로잉 수
-        return MyPageResponseDTO.fromMemberEntity(memberEntity,followerCount, followingCount);
+        // 팔로우 여부 확인
+        boolean following = followRepository.existsByFollowerAndFollowing(currentUser, memberEntity);
+        //return MyPageResponseDTO.fromMemberEntity(memberEntity,followerCount, followingCount);
+        // UserPageResponseDTO 생성 및 반환
+        return UserPageResponseDTO.fromMemberEntity(memberEntity, followerCount, followingCount, following);
     }
 }
