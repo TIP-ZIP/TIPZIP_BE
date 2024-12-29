@@ -33,7 +33,8 @@ public class ScrapController {
         return ResponseEntity.status(201).body(scrapByCategoryDTOs);
     }
 
-    @GetMapping("/folder")
+    // body를 받기 위해 post로 변경
+    @PostMapping("/folder")
     public ResponseEntity<?> getFolder(@RequestHeader(value = "Authorization") String token, @RequestBody Map<String, String> folderNameMap) {
         List<MyPostDTO> scrapByCategoryDTOs = scrapService.getScrapByFolder(folderNameMap.get("folder_name"), token);
         return ResponseEntity.status(201).body(scrapByCategoryDTOs);
