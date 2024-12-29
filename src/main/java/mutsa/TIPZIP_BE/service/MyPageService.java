@@ -25,6 +25,8 @@ public class MyPageService {
         String email=jwtTokenProvider.getEmailFromToken(token.replace("Bearer ", ""));
         MemberEntity memberEntity = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+        // 최신 데이터 확인
+        System.out.println("Message in DB: " + memberEntity.getMessage());
 
         //아래는 예시이며, post, follow관련 로직 구현 후 수정필요.
         //int postCount = postRepository.countByUserId(memberEntity.getUser_id()); // 게시글 수
@@ -60,6 +62,8 @@ public class MyPageService {
 
         memberEntity.setMessage(newMessage);
         memberRepository.save(memberEntity);
+        // 디버깅용 출력
+        System.out.println("Updated Message: " + memberEntity.getMessage());
     }
     public String updateProfileImage(String token, MultipartFile file){
         String email=jwtTokenProvider.getEmailFromToken(token.replace("Bearer ", ""));
