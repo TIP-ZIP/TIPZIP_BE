@@ -30,6 +30,8 @@ public class ScrapService {
 
     @Transactional
     public ScrapResponseDTO createScrap(String token, ScrapRequestsDTO scrapRequestsDTO) {
+        // 현재 로그인 중인 사용자 정보 가져오기
+        MemberEntity member = memberService.getUserFromToken(token);
 
         Post post = postRepository.findById(scrapRequestsDTO.post_id())
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 Post 입니다 : " + scrapRequestsDTO.post_id()));
@@ -37,12 +39,9 @@ public class ScrapService {
         // folder 설정은 필수 사항이 아니어서 folder_name이 null일 수 있음
         Folder folder = null;
         if (scrapRequestsDTO.folder_name() != null && !scrapRequestsDTO.folder_name().isEmpty()) {
-            folder = folderRepository.findByFolderName(scrapRequestsDTO.folder_name())
+            folder = folderRepository.findByFolderNameAndMemberEntity(scrapRequestsDTO.folder_name(), member)
                     .orElseThrow(() -> new RuntimeException("존재하지 않는 Folder 입니다 : " + scrapRequestsDTO.folder_name()));
-        }
-
-        // 현재 로그인 중인 사용자 정보 가져오기
-        MemberEntity member = memberService.getUserFromToken(token);
+        } log.info("Folder : ", folder);
 
         Scrap scrap = Scrap.builder()
                 .categoryId(post.getCategory().getId())
