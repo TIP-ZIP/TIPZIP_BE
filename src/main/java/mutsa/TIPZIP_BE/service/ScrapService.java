@@ -41,7 +41,7 @@ public class ScrapService {
         if (scrapRequestsDTO.folder_name() != null && !scrapRequestsDTO.folder_name().isEmpty()) {
             folder = folderRepository.findByFolderNameAndMemberEntity(scrapRequestsDTO.folder_name(), member)
                     .orElseThrow(() -> new RuntimeException("존재하지 않는 Folder 입니다 : " + scrapRequestsDTO.folder_name()));
-        } log.info("Folder : ", folder.getFolderName());
+        }
 
         Scrap scrap = Scrap.builder()
                 .categoryId(post.getCategory().getId())
@@ -59,6 +59,7 @@ public class ScrapService {
         return new ScrapResponseDTO(scrap);
     }
 
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public List<MyPostDTO> getScrapByCategory(long id, String token) {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 Category 입니다 : " + id));
@@ -72,6 +73,7 @@ public class ScrapService {
                 .collect(Collectors.toList());
     }
 
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public List<MyPostDTO> getScrapByFolder(String folderName, String token) {
         MemberEntity member = memberService.getUserFromToken(token);
 
@@ -96,8 +98,9 @@ public class ScrapService {
         Scrap scrap = scrapRepository.findByPostAndMemberEntity(post, member)
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 Scrap 입니다 : " + scrapRequestsDTO.post_id()));
 
+        scrapRepository.delete(scrap);
+
         // post 에 scrap count --
         post.removeScrap();
-        scrapRepository.delete(scrap);
     }
 }
