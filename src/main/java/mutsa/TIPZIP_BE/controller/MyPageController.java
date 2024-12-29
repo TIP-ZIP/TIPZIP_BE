@@ -1,6 +1,8 @@
 package mutsa.TIPZIP_BE.controller;
 
 import mutsa.TIPZIP_BE.dto.MyPageResponseDTO;
+import mutsa.TIPZIP_BE.dto.UserPageResponseDTO;
+import mutsa.TIPZIP_BE.jwt.JwtTokenProvider;
 import mutsa.TIPZIP_BE.service.MyPageService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,8 +17,10 @@ import java.util.Map;
 @RequestMapping("/mypage")
 public class MyPageController {
     private final MyPageService myPageService;
-    public MyPageController(MyPageService myPageService) {
+    private final JwtTokenProvider jwtTokenProvider;
+    public MyPageController(MyPageService myPageService, JwtTokenProvider jwtTokenProvider) {
         this.myPageService=myPageService;
+        this.jwtTokenProvider = jwtTokenProvider;
 
     }
     @GetMapping("/")
@@ -72,9 +76,11 @@ public class MyPageController {
         }
     }
     @GetMapping("/{id}")
-    public ResponseEntity<?> viewOtherUserPage(@PathVariable Long id){
+    public ResponseEntity<?> viewOtherUserPage(@PathVariable Long id, @RequestHeader("Authorization") String token) {
         try{
-            MyPageResponseDTO responseDTO=myPageService.getOtherUserPage(id);
+            // 현재 사용자 이메일 추출
+            String email = jwtTokenProvider.getEmailFromToken(token.replace("Bearer ", ""));
+            UserPageResponseDTO responseDTO=myPageService.getOtherUserPage(id,email);
             return ResponseEntity.ok(responseDTO);
         }catch (IllegalArgumentException e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
