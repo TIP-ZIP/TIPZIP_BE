@@ -43,13 +43,16 @@ public class Post {
     @OneToOne(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = true)
     private Scrap scrap;
 
+    @Column(length = 50)
     private String title;
     @CreatedDate
     @Column(updatable = false, nullable = false)
     private LocalDateTime createdAt;
     @Column(length = 50000)
     private String content;
+    @Column(length = 1000)
     private String link_url;
+    @Column(length = 1000)
     private String thumbnail_url;
     private long scrapCount; // 스크랩 수
 
